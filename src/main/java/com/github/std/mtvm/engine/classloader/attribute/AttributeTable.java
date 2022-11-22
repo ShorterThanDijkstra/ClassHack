@@ -10,8 +10,8 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.github.std.mtvm.engine.util.ByteUtil.byteArrayToInt;
-import static com.github.std.mtvm.engine.util.ByteUtil.byteArrayToLong;
+import static com.github.std.mtvm.engine.util.BytesReader.byteArrayToInt;
+import static com.github.std.mtvm.engine.util.BytesReader.byteArrayToLong;
 import static com.github.std.mtvm.engine.util.Logger.info;
 
 public class AttributeTable {
@@ -27,24 +27,29 @@ public class AttributeTable {
 
     public AttributeTable(int attrCount, InputStream input, ClassFile.ClassFileBuilder metaData) throws IOException {
         attributes = new ArrayList<>(attrCount);
-        AttributeChecker checker = new AttributeChecker();
         for (int i = 0; i < attrCount; i++) {
-            parseAttr(input, metaData, checker);
+            parseAttr(input, metaData);
         }
     }
 
     private void parseAttr(InputStream input,
-                           ClassFile.ClassFileBuilder metaData,
-                           AttributeChecker checker) throws IOException {
+                           ClassFile.ClassFileBuilder metaData) throws IOException {
         String name = getAttrName(input, metaData.constantPool);
         if ("ConstantValue".equals(name)) {
-            parseConstantValue(input, metaData.constantPool, checker);
+            parseConstantValue(input, metaData.constantPool);
         } else if ("Code".equals(name)) {
             parseCode(input, metaData);
+        } else if ("StackMapTable".equals(name)) {
+            parseStackMapTable(input, metaData);
         } else {
-            info("Unknown attribute: " + name + " ,skipped");
+            info("Unknown attribute: " + name + ", skipped");
             skip(input);
         }
+    }
+
+    private void parseStackMapTable(InputStream input, ClassFile.ClassFileBuilder metaData) throws IOException {
+        StackMapTable stackMapTable = new StackMapTable(input, metaData);
+        attributes.add(stackMapTable);
     }
 
     private void skip(InputStream input) throws IOException {
@@ -59,14 +64,14 @@ public class AttributeTable {
     }
 
     private void parseConstantValue(InputStream input,
-                                    ConstantPool constantPool,
-                                    AttributeChecker checker) throws IOException {
-        ConstantValue attr = new ConstantValue(input, constantPool, checker);
+                                    ConstantPool constantPool) throws IOException {
+        ConstantValue attr = new ConstantValue(input, constantPool);
         attributes.add(attr);
     }
 
 
-    private String getAttrName(InputStream input, ConstantPool constantPool) throws IOException {
+    private String getAttrName(InputStream input,
+                               ConstantPool constantPool) throws IOException {
         byte[] bsNameIndex = new byte[2];
         int read = input.read(bsNameIndex);
         assert read == 2;

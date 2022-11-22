@@ -6,13 +6,14 @@ import com.github.std.mtvm.engine.classloader.constant.ConstantPool;
 import java.io.IOException;
 import java.io.InputStream;
 
+import static com.github.std.mtvm.engine.classloader.attribute.AttributeChecker.checkConstantValue;
 import static com.github.std.mtvm.engine.classloader.attribute.AttributeTable.getAttrLength;
-import static com.github.std.mtvm.engine.util.ByteUtil.byteArrayToInt;
+import static com.github.std.mtvm.engine.util.BytesReader.byteArrayToInt;
 
 public final class ConstantValue implements AttributeInfo {
     private final Constant value;
 
-    public ConstantValue(InputStream input, ConstantPool constantPool, AttributeChecker checker) throws IOException {
+    public ConstantValue(InputStream input, ConstantPool constantPool) throws IOException {
         long length = getAttrLength(input);
         if (length != 2) {
             throw new ClassFormatError();
@@ -24,7 +25,7 @@ public final class ConstantValue implements AttributeInfo {
 
         int constIndex = byteArrayToInt(bsConstIndex);
         Constant constant = constantPool.getPool().get(constIndex - 1);
-        checker.checkConstantValue(constant);
+        checkConstantValue(constant);
         this.value = constant;
     }
 

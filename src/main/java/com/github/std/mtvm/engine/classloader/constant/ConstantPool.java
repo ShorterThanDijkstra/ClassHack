@@ -5,7 +5,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.github.std.mtvm.engine.util.ByteUtil.byteArrayToInt;
+import static com.github.std.mtvm.engine.util.BytesReader.byteArrayToInt;
 
 public class ConstantPool {
     public static final byte CONSTANT_Class = 7;

@@ -8,7 +8,7 @@ import com.github.std.mtvm.engine.classloader.constant.ConstantUtf8;
 import java.util.List;
 
 public class FieldInfoChecker {
-    public void checkAccessFlags(byte[] accessFlags, ClassFile.ClassFileBuilder metaData) {
+    public static void checkAccessFlags(byte[] accessFlags, ClassFile.ClassFileBuilder metaData) {
         // may have at most one of its ACC_PUBLIC, ACC_PRIVATE, and
         // ACC_PROTECTED flags set
         int pblPvtPtt = (accessFlags[1] & 0x01) |
@@ -52,7 +52,7 @@ public class FieldInfoChecker {
         }
     }
 
-    public String checkNameIndex(ConstantPool constantPool, int nameIndex) {
+    public static String checkNameIndex(ConstantPool constantPool, int nameIndex) {
         List<Constant> constants = constantPool.getPool();
         Constant constUtf8 = constants.get(nameIndex - 1);
         if (!(constUtf8 instanceof ConstantUtf8)) {
@@ -61,7 +61,7 @@ public class FieldInfoChecker {
         return ((ConstantUtf8) constUtf8).getValue();
     }
 
-    public String checkDescIndex(ConstantPool constantPool, int descIndex) {
+    public static String checkDescIndex(ConstantPool constantPool, int descIndex) {
         List<Constant> constants = constantPool.getPool();
         Constant constUtf8 = constants.get(descIndex - 1);
         if (!(constUtf8 instanceof ConstantUtf8)) {

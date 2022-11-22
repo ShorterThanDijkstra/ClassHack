@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.github.std.mtvm.engine.classloader.attribute.AttributeTable.getAttrLength;
-import static com.github.std.mtvm.engine.util.ByteUtil.byteArrayToInt;
+import static com.github.std.mtvm.engine.util.BytesReader.byteArrayToInt;
 
 public final class Code implements AttributeInfo {
     private final int maxStack;

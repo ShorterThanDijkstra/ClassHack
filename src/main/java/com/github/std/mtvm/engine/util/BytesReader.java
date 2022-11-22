@@ -3,7 +3,7 @@ package com.github.std.mtvm.engine.util;
 import java.io.IOException;
 import java.io.InputStream;
 
-public class ByteUtil {
+public class BytesReader {
     public static long byteArrayToLong(byte[] bs) throws IOException {
         long res = 0;
         for (byte b : bs) {
@@ -27,13 +27,28 @@ public class ByteUtil {
         return sb.toString();
     }
 
-    public static void main(String[] args) {
-        byte[] high = new byte[]{0x7f, (byte) 0xf0, 0, 0};
-        byte[] low = new byte[]{0, 0, 0, 0};
+    public static int readByte(InputStream input) throws IOException {
+        byte[] bytes = new byte[1];
+        int read = input.read(bytes);
+        assert read == 1;
 
-        long bits = byteArrayToInt(high);
-        bits = bits << 32 | byteArrayToInt(low);
+        return bytes[0] & 0xff;
+    }
 
-        System.out.println(Double.longBitsToDouble(bits));
+    // TODO: 2022/11/22
+    public static int readBytes2(InputStream input) throws IOException {
+        byte[] bytes = new byte[2];
+        int read = input.read(bytes);
+        assert read == 2;
+
+        return byteArrayToInt(bytes);
+    }
+
+    public static long readBytes4(InputStream input) throws IOException {
+        byte[] bytes = new byte[4];
+        int read = input.read(bytes);
+        assert read == 4;
+
+        return byteArrayToLong(bytes);
     }
 }

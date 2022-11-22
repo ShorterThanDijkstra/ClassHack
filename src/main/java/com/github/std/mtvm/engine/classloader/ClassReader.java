@@ -11,7 +11,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.github.std.mtvm.engine.util.ByteUtil.byteArrayToInt;
+import static com.github.std.mtvm.engine.util.BytesReader.byteArrayToInt;
 
 public final class ClassReader implements Closeable {
     private final InputStream input;

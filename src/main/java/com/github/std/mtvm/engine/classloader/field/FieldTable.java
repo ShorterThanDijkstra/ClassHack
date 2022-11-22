@@ -2,15 +2,14 @@ package com.github.std.mtvm.engine.classloader.field;
 
 import com.github.std.mtvm.engine.classloader.ClassFile;
 import com.github.std.mtvm.engine.classloader.attribute.AttributeTable;
-import com.github.std.mtvm.engine.classloader.constant.ConstantPool;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.github.std.mtvm.engine.util.ByteUtil.byteArrayToHex;
-import static com.github.std.mtvm.engine.util.ByteUtil.byteArrayToInt;
+import static com.github.std.mtvm.engine.classloader.field.FieldInfoChecker.*;
+import static com.github.std.mtvm.engine.util.BytesReader.byteArrayToInt;
 
 public class FieldTable {
     private final List<FieldInfo> fieldInfos;
@@ -19,21 +18,19 @@ public class FieldTable {
                       InputStream input,
                       ClassFile.ClassFileBuilder metaData) throws IOException {
         this.fieldInfos = new ArrayList<>(fieldsCount);
-        FieldInfoChecker checker = new FieldInfoChecker();
         for (int i = 0; i < fieldsCount; i++) {
-            parseFieldInfo(input, metaData, checker);
+            parseFieldInfo(input, metaData);
         }
     }
 
     private void parseFieldInfo(InputStream input,
-                                ClassFile.ClassFileBuilder metaData,
-                                FieldInfoChecker checker) throws IOException {
+                                ClassFile.ClassFileBuilder metaData) throws IOException {
 
         FieldInfo.FieldInfoBuilder builder = new FieldInfo.FieldInfoBuilder();
 
-        parseFieldInfoAccessFlags(input, metaData, builder, checker);
-        parseFieldInfoName(input, metaData, builder, checker);
-        parseFieldInfoDescriptor(input, metaData, builder, checker);
+        parseFieldInfoAccessFlags(input, metaData, builder);
+        parseFieldInfoName(input, metaData, builder);
+        parseFieldInfoDescriptor(input, metaData, builder);
         parseFieldInfoAttrs(input, metaData, builder);
 
         fieldInfos.add(builder.build());
@@ -41,8 +38,7 @@ public class FieldTable {
 
     private void parseFieldInfoAccessFlags(InputStream input,
                                            ClassFile.ClassFileBuilder metaData,
-                                           FieldInfo.FieldInfoBuilder builder,
-                                           FieldInfoChecker checker) throws IOException {
+                                           FieldInfo.FieldInfoBuilder builder) throws IOException {
         byte[] bsAccessFlags = new byte[2];
         int read = input.read(bsAccessFlags);
         assert read == 2;
@@ -76,32 +72,30 @@ public class FieldTable {
             accessFlags.add("ACC_ENUM");
         }
 
-        checker.checkAccessFlags(bsAccessFlags, metaData);
+        checkAccessFlags(bsAccessFlags, metaData);
         builder.accessFlags = accessFlags;
     }
 
     private void parseFieldInfoName(InputStream input,
                                     ClassFile.ClassFileBuilder metaData,
-                                    FieldInfo.FieldInfoBuilder builder,
-                                    FieldInfoChecker checker) throws IOException {
+                                    FieldInfo.FieldInfoBuilder builder) throws IOException {
         byte[] bsNameIndex = new byte[2];
         int read = input.read(bsNameIndex);
         assert read == 2;
 
         int nameIndex = byteArrayToInt(bsNameIndex);
-        builder.name = checker.checkNameIndex(metaData.constantPool, nameIndex);
+        builder.name = checkNameIndex(metaData.constantPool, nameIndex);
     }
 
     private void parseFieldInfoDescriptor(InputStream input,
                                           ClassFile.ClassFileBuilder metaData,
-                                          FieldInfo.FieldInfoBuilder builder,
-                                          FieldInfoChecker checker) throws IOException {
+                                          FieldInfo.FieldInfoBuilder builder) throws IOException {
         byte[] bsDescIndex = new byte[2];
         int read = input.read(bsDescIndex);
         assert read == 2;
 
         int descIndex = byteArrayToInt(bsDescIndex);
-        builder.descriptor = checker.checkDescIndex(metaData.constantPool, descIndex);
+        builder.descriptor = checkDescIndex(metaData.constantPool, descIndex);
     }
 
     private void parseFieldInfoAttrs(InputStream input,

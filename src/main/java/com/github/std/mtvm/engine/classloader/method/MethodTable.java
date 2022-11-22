@@ -2,14 +2,13 @@ package com.github.std.mtvm.engine.classloader.method;
 
 import com.github.std.mtvm.engine.classloader.ClassFile;
 import com.github.std.mtvm.engine.classloader.attribute.AttributeTable;
-import com.github.std.mtvm.engine.classloader.constant.ConstantPool;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.github.std.mtvm.engine.util.ByteUtil.byteArrayToInt;
+import static com.github.std.mtvm.engine.util.BytesReader.byteArrayToInt;
 
 public class MethodTable {
     private final List<MethodInfo> methodInfos;
