@@ -11,7 +11,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.github.std.mtvm.engine.util.BytesReader.byteArrayToInt;
+import static com.github.std.mtvm.engine.util.BytesReader.readBytes2;
 
 public final class ClassReader implements Closeable {
     private final InputStream input;
@@ -60,28 +60,16 @@ public final class ClassReader implements Closeable {
 
 
     private void parseMinorVersion() throws IOException {
-        byte[] minorVersion = new byte[2];
-        int read = input.read(minorVersion);
-        assert read == 2;
-
-        builder.minorVersion = byteArrayToInt(minorVersion);
+        builder.minorVersion = readBytes2(input);
     }
 
     private void parseMajorVersion() throws IOException {
-        byte[] majorVersion = new byte[2];
-        int read = input.read(majorVersion);
-        assert read == 2;
-
-        builder.majorVersion = byteArrayToInt(majorVersion);
+        builder.majorVersion = readBytes2(input);
     }
 
 
     private void parseConstantPool() throws IOException {
-        byte[] bsConstPoolCount = new byte[2];
-        int read = input.read(bsConstPoolCount);
-        assert read == 2;
-
-        int constantPoolCount = byteArrayToInt(bsConstPoolCount);
+        int constantPoolCount = readBytes2(input);
         builder.constantPool = new ConstantPool(constantPoolCount - 1, input);
     }
 
@@ -120,66 +108,40 @@ public final class ClassReader implements Closeable {
     }
 
     private void parseThisClass() throws IOException {
-        byte[] bsThisClass = new byte[2];
-        int read = input.read(bsThisClass);
-        assert read == 2;
-
-        int thisClassIndex = byteArrayToInt(bsThisClass);
+        int thisClassIndex = readBytes2(input);
         ConstantPool constantPool = builder.constantPool;
         builder.thisClass = checker.checkThisClass(constantPool, thisClassIndex);
     }
 
     private void parseSuperClass() throws IOException {
-        byte[] bsSuperClass = new byte[2];
-        int read = input.read(bsSuperClass);
-        assert read == 2;
-
-        int superClassIndex = byteArrayToInt(bsSuperClass);
-
+        int superClassIndex = readBytes2(input);
         builder.superClass = checker.checkSuperClass(builder.constantPool, superClassIndex, builder.isInterface());
 
     }
 
     private void parseInterfaces() throws IOException {
-        byte[] bsInterfacesNum = new byte[2];
-        int read = input.read(bsInterfacesNum);
-        assert read == 2;
-        int interfacesNum = byteArrayToInt(bsInterfacesNum);
-
+        int interfacesNum = readBytes2(input);
         int[] constClassIndices = new int[interfacesNum];
         for (int i = 0; i < interfacesNum; i++) {
-            byte[] bsConstClassIndex = new byte[2];
-            read = input.read(bsConstClassIndex);
-            assert read == 2;
-            constClassIndices[i] = byteArrayToInt(bsConstClassIndex);
+            constClassIndices[i] = readBytes2(input);
         }
         builder.interfaces = checker.checkInterfaces(builder.constantPool, constClassIndices);
     }
 
     private void parseFields() throws IOException {
-        byte[] bsFieldsNum = new byte[2];
-        int read = input.read(bsFieldsNum);
-        assert read == 2;
-
-        int fieldsCount = byteArrayToInt(bsFieldsNum);
+        int fieldsCount = readBytes2(input);
         builder.fieldTable = new FieldTable(fieldsCount, input, builder);
     }
 
     private void parseMethods() throws IOException {
-        byte[] bsMethodCount = new byte[2];
-        int read = input.read(bsMethodCount);
-        assert read == 2;
+        int methodCount = readBytes2(input);
 
-        int methodCount = byteArrayToInt(bsMethodCount);
         builder.methodTable = new MethodTable(methodCount, input, builder);
     }
 
     private void parseAttributes() throws IOException {
-        byte[] bsAttrCount = new byte[2];
-        int read = input.read(bsAttrCount);
-        assert read == 2;
+        int attrCount = readBytes2(input);
 
-        int attrCount = byteArrayToInt(bsAttrCount);
         builder.attributeTable = new AttributeTable(attrCount, input, builder);
     }
 

@@ -5,7 +5,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.github.std.mtvm.engine.util.BytesReader.byteArrayToInt;
+import static com.github.std.mtvm.engine.util.BytesReader.*;
 
 public class ConstantPool {
     public static final byte CONSTANT_Class = 7;
@@ -98,53 +98,33 @@ public class ConstantPool {
 
 
     private void parseInvokeDynamic(InputStream input) throws IOException {
-        byte[] bsBootIndex = new byte[2];
-        byte[] bsNameAndTypeIndex = new byte[2];
-
-        int read = input.read(bsBootIndex);
-        assert read == 2;
-
-        read = input.read(bsNameAndTypeIndex);
-        assert read == 2;
-
+        int bootIndex = readBytes2(input);
+        int nameAndTypeIndex = readBytes2(input);
         pool.add(new ConstantInvokeDynamic(
-                byteArrayToInt(bsBootIndex),
-                byteArrayToInt(bsNameAndTypeIndex)
+                bootIndex, nameAndTypeIndex
         ));
     }
 
     private void parseMethodType(InputStream input) throws IOException {
-        byte[] bsDesc = new byte[2];
-        int read = input.read(bsDesc);
-        assert read == 2;
-
-        pool.add(new ConstantMethodType(
-                byteArrayToInt(bsDesc)
-        ));
+        int descIndex = readBytes2(input);
+        pool.add(new ConstantMethodType(descIndex));
     }
 
     private void parseMethodHandle(InputStream input) throws IOException {
-        int refKind = input.read();
+        int refKind = readByte(input);
         assert refKind <= 9 && refKind >= 1;
 
-        byte[] bsRefIndex = new byte[2];
-        int read = input.read(bsRefIndex);
-        assert read == 2;
-
+        int refIndex = readBytes2(input);
         pool.add(new ConstantMethodHandle(
                 refKind,
-                byteArrayToInt(bsRefIndex)
+                refIndex
         ));
     }
 
     private void parseUtf8(InputStream input) throws IOException {
-        byte[] bsLen = new byte[2];
-        int read = input.read(bsLen);
-        assert read == 2;
-
-        int len = byteArrayToInt(bsLen);
+        int len = readBytes2(input);
         byte[] bsUtf8 = new byte[len];
-        read = input.read(bsUtf8);
+        int read = input.read(bsUtf8);
         assert read == len;
 
         String value = new String(bsUtf8);
@@ -153,131 +133,77 @@ public class ConstantPool {
     }
 
     private void parseNameAndType(InputStream input) throws IOException {
-        byte[] bsName = new byte[2];
-        byte[] bsDesc = new byte[2];
-
-        int read = input.read(bsName);
-        assert read == 2;
-        read = input.read(bsDesc);
-        assert read == 2;
-
+        int nameIndex = readBytes2(input);
+        int descIndex = readBytes2(input);
         pool.add(new ConstantNameAndType(
-                byteArrayToInt(bsName),
-                byteArrayToInt(bsDesc)
+                nameIndex,
+                descIndex
         ));
     }
 
     private void parseDouble(InputStream input) throws IOException {
-        byte[] highBytes = new byte[4];
-        byte[] lowBytes = new byte[4];
 
-        int read = input.read(highBytes);
-        assert read == 4;
-
-        read = input.read(lowBytes);
-        assert read == 4;
-
-        long bits = byteArrayToInt(highBytes);
-        bits = bits << 32 | byteArrayToInt(lowBytes);
+        long bits = readBytes4(input);
+        bits = bits << 32 | readBytes4(input);
         double value = Double.longBitsToDouble(bits);
 
         pool.add(new ConstantDouble(value));
     }
 
     private void parseLong(InputStream input) throws IOException {
-        byte[] highBytes = new byte[4];
-        byte[] lowBytes = new byte[4];
 
-        int read = input.read(highBytes);
-        assert read == 4;
-
-        read = input.read(lowBytes);
-        assert read == 4;
-
-        long value = byteArrayToInt(highBytes);
-        value = value << 32 | byteArrayToInt(lowBytes);
-
+        long value = readBytes4(input);
+        value = value << 32 | readBytes4(input);
         pool.add(new ConstantLong(value));
 
     }
 
     private void parseFloat(InputStream input) throws IOException {
-        byte[] bs = new byte[4];
-        int read = input.read(bs);
-        assert read == 4;
-
-        float value = Float.intBitsToFloat(byteArrayToInt(bs));
+        int bits = (int) readBytes4(input);
+        float value = Float.intBitsToFloat(bits);
         pool.add(new ConstantFloat(value));
     }
 
     private void parseInteger(InputStream input) throws IOException {
-        byte[] bs = new byte[4];
-        int read = input.read(bs);
-        assert read == 4;
-
-        int value = byteArrayToInt(bs);
+        int value = (int) readBytes4(input);
         pool.add(new ConstantInteger(value));
     }
 
     private void parseString(InputStream input) throws IOException {
-        byte[] stringIndex = new byte[2];
-        int read = input.read(stringIndex);
-        assert read == 2;
-        pool.add(new ConstantString(
-                byteArrayToInt(stringIndex)
-        ));
+        int strIndex = readBytes2(input);
+        pool.add(new ConstantString(strIndex));
     }
 
     private void parseInterfaceMethodRef(InputStream input) throws IOException {
-        byte[] classIndex = new byte[2];
-        byte[] nameAndTypeIndex = new byte[2];
-
-        int read = input.read(classIndex);
-        assert read == 2;
-        read = input.read(nameAndTypeIndex);
-        assert read == 2;
-
+        int classIndex = readBytes2(input);
+        int nameAndTypeIndex = readBytes2(input);
         pool.add(new ConstantInterfaceMethodRef(
-                byteArrayToInt(classIndex),
-                byteArrayToInt(nameAndTypeIndex)
+                classIndex,
+                nameAndTypeIndex
         ));
     }
 
     private void parseMethodRef(InputStream input) throws IOException {
-        byte[] classIndex = new byte[2];
-        byte[] nameAndTypeIndex = new byte[2];
-
-        int read = input.read(classIndex);
-        assert read == 2;
-        read = input.read(nameAndTypeIndex);
-        assert read == 2;
-
+        int classIndex = readBytes2(input);
+        int nameAndTypeIndex = readBytes2(input);
         pool.add(new ConstantMethodRef(
-                byteArrayToInt(classIndex),
-                byteArrayToInt(nameAndTypeIndex)
+                classIndex,
+                nameAndTypeIndex
         ));
     }
 
     private void parseFieldRef(InputStream input) throws IOException {
-        byte[] classIndex = new byte[2];
-        byte[] nameAndTypeIndex = new byte[2];
-
-        int read = input.read(classIndex);
-        assert read == 2;
-        read = input.read(nameAndTypeIndex);
-        assert read == 2;
-
+        int classIndex = readBytes2(input);
+        int nameAndTypeIndex = readBytes2(input);
         pool.add(new ConstantFieldRef(
-                byteArrayToInt(classIndex),
-                byteArrayToInt(nameAndTypeIndex)
+                classIndex,
+                nameAndTypeIndex
         ));
     }
 
     private void parseClass(InputStream input) throws IOException {
-        byte[] nameIndex = new byte[2];
-        int read = input.read(nameIndex);
-        assert read == 2;
-        pool.add(new ConstantClass(byteArrayToInt(nameIndex)));
+        int nameIndex = readBytes2(input);
+        pool.add(new ConstantClass(nameIndex));
     }
 
     public List<Constant> getPool() {

@@ -35,7 +35,6 @@ public class BytesReader {
         return bytes[0] & 0xff;
     }
 
-    // TODO: 2022/11/22
     public static int readBytes2(InputStream input) throws IOException {
         byte[] bytes = new byte[2];
         int read = input.read(bytes);

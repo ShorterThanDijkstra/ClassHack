@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.github.std.mtvm.engine.classloader.field.FieldInfoChecker.*;
-import static com.github.std.mtvm.engine.util.BytesReader.byteArrayToInt;
+import static com.github.std.mtvm.engine.util.BytesReader.readBytes2;
 
 public class FieldTable {
     private final List<FieldInfo> fieldInfos;
@@ -79,33 +79,21 @@ public class FieldTable {
     private void parseFieldInfoName(InputStream input,
                                     ClassFile.ClassFileBuilder metaData,
                                     FieldInfo.FieldInfoBuilder builder) throws IOException {
-        byte[] bsNameIndex = new byte[2];
-        int read = input.read(bsNameIndex);
-        assert read == 2;
-
-        int nameIndex = byteArrayToInt(bsNameIndex);
+        int nameIndex = readBytes2(input);
         builder.name = checkNameIndex(metaData.constantPool, nameIndex);
     }
 
     private void parseFieldInfoDescriptor(InputStream input,
                                           ClassFile.ClassFileBuilder metaData,
                                           FieldInfo.FieldInfoBuilder builder) throws IOException {
-        byte[] bsDescIndex = new byte[2];
-        int read = input.read(bsDescIndex);
-        assert read == 2;
-
-        int descIndex = byteArrayToInt(bsDescIndex);
+        int descIndex = readBytes2(input);
         builder.descriptor = checkDescIndex(metaData.constantPool, descIndex);
     }
 
     private void parseFieldInfoAttrs(InputStream input,
                                      ClassFile.ClassFileBuilder metaData,
                                      FieldInfo.FieldInfoBuilder builder) throws IOException {
-        byte[] bsAttrCount = new byte[2];
-        int read = input.read(bsAttrCount);
-        assert read == 2;
-
-        int attrCount = byteArrayToInt(bsAttrCount);
+        int attrCount = readBytes2(input);
         builder.attributeTable = new AttributeTable(attrCount, input, metaData);
     }
 

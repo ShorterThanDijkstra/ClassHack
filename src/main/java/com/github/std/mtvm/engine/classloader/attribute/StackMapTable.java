@@ -10,7 +10,8 @@ import java.util.Deque;
 import java.util.List;
 
 import static com.github.std.mtvm.engine.classloader.attribute.AttributeTable.getAttrLength;
-import static com.github.std.mtvm.engine.util.BytesReader.*;
+import static com.github.std.mtvm.engine.util.BytesReader.readByte;
+import static com.github.std.mtvm.engine.util.BytesReader.readBytes2;
 
 // thanks to this blog: https://blog.csdn.net/qq_26000415/article/details/94401129
 public final class StackMapTable implements AttributeInfo {

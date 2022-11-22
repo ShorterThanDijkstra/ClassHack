@@ -10,19 +10,15 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.github.std.mtvm.engine.util.BytesReader.byteArrayToInt;
-import static com.github.std.mtvm.engine.util.BytesReader.byteArrayToLong;
+import static com.github.std.mtvm.engine.util.BytesReader.readBytes2;
+import static com.github.std.mtvm.engine.util.BytesReader.readBytes4;
 import static com.github.std.mtvm.engine.util.Logger.info;
 
 public class AttributeTable {
     private final List<AttributeInfo> attributes;
 
     public static long getAttrLength(InputStream input) throws IOException {
-        byte[] bsAttrLen = new byte[4];
-        int read = input.read(bsAttrLen);
-        assert read == 4;
-
-        return byteArrayToLong(bsAttrLen);
+        return readBytes4(input);
     }
 
     public AttributeTable(int attrCount, InputStream input, ClassFile.ClassFileBuilder metaData) throws IOException {
@@ -72,11 +68,8 @@ public class AttributeTable {
 
     private String getAttrName(InputStream input,
                                ConstantPool constantPool) throws IOException {
-        byte[] bsNameIndex = new byte[2];
-        int read = input.read(bsNameIndex);
-        assert read == 2;
+        int nameIndex = readBytes2(input);
 
-        int nameIndex = byteArrayToInt(bsNameIndex);
         Constant constUtf8 = constantPool.getPool().get(nameIndex - 1);
         if (!(constUtf8 instanceof ConstantUtf8)) {
             throw new ClassFormatError();

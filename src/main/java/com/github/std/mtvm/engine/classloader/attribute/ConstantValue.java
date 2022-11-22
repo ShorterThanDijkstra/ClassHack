@@ -8,7 +8,7 @@ import java.io.InputStream;
 
 import static com.github.std.mtvm.engine.classloader.attribute.AttributeChecker.checkConstantValue;
 import static com.github.std.mtvm.engine.classloader.attribute.AttributeTable.getAttrLength;
-import static com.github.std.mtvm.engine.util.BytesReader.byteArrayToInt;
+import static com.github.std.mtvm.engine.util.BytesReader.readBytes2;
 
 public final class ConstantValue implements AttributeInfo {
     private final Constant value;
@@ -18,12 +18,8 @@ public final class ConstantValue implements AttributeInfo {
         if (length != 2) {
             throw new ClassFormatError();
         }
+        int constIndex = readBytes2(input);
 
-        byte[] bsConstIndex = new byte[2];
-        int read = input.read(bsConstIndex);
-        assert read == 2;
-
-        int constIndex = byteArrayToInt(bsConstIndex);
         Constant constant = constantPool.getPool().get(constIndex - 1);
         checkConstantValue(constant);
         this.value = constant;
