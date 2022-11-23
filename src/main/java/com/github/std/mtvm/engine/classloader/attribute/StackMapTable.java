@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 
-import static com.github.std.mtvm.engine.classloader.attribute.AttributeTable.getAttrLength;
 import static com.github.std.mtvm.engine.util.BytesReader.readByte;
 import static com.github.std.mtvm.engine.util.BytesReader.readBytes2;
 
@@ -304,7 +303,7 @@ public final class StackMapTable implements AttributeInfo {
     }
 
     public StackMapTable(InputStream input, ClassFile.ClassFileBuilder metaData) throws IOException {
-        this.attrLen = getAttrLength(input);
+        this.attrLen = AttributeTable.getAttrLen(input);
 
         int entriesNum = readBytes2(input);
         this.entries = new ArrayList<>(entriesNum);

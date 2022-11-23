@@ -209,4 +209,21 @@ public class ConstantPool {
     public List<Constant> getPool() {
         return pool;
     }
+
+    public String getConstClassName(int index) {
+        Constant constClass = pool.get(index - 1);
+        if (!(constClass instanceof ConstantClass)) {
+            throw new ClassFormatError();
+        }
+        int nameIndex = ((ConstantClass) constClass).getNameIndex();
+        return getUtf8Str(nameIndex);
+    }
+
+    public String getUtf8Str(int index) {
+        Constant constUtf8 = pool.get(index - 1);
+        if (!(constUtf8 instanceof ConstantUtf8)) {
+            throw new ClassFormatError();
+        }
+        return ((ConstantUtf8) constUtf8).getValue();
+    }
 }

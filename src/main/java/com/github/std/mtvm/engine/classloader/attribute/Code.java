@@ -11,7 +11,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.github.std.mtvm.engine.classloader.attribute.AttributeTable.getAttrLength;
+import static com.github.std.mtvm.engine.classloader.attribute.AttributeTable.getAttrLen;
 import static com.github.std.mtvm.engine.util.BytesReader.readBytes2;
 import static com.github.std.mtvm.engine.util.BytesReader.readBytes4;
 
@@ -92,7 +92,7 @@ public final class Code implements AttributeInfo {
     }
 
     public Code(InputStream input, ClassFile.ClassFileBuilder metaData) throws IOException {
-        getAttrLength(input);
+        getAttrLen(input);
         this.maxStack = parseMaxStack(input);
         this.maxLocals = parseMaxLocals(input);
         this.opcodes = parseOpcodes(input);
