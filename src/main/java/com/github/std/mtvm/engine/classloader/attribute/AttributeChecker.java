@@ -85,7 +85,27 @@ public class AttributeChecker {
     public static String checkLocalVariableTableNameIndex(int index, ConstantPool constantPool) {
         return constantPool.getUtf8Str(index);
     }
+
     public static String checkLocalVariableTableDescIndex(int index, ConstantPool constantPool) {
         return constantPool.getUtf8Str(index);
+    }
+
+    public static void checkConstElementValueTag(int tag, Constant constant) {
+        if ((tag == 'B' || tag == 'C' || tag == 'I' || tag == 'S' || tag == 'Z')
+                && !(constant instanceof ConstantInteger)) {
+            throw new ClassFormatError();
+        }
+        if (tag == 'D' && !(constant instanceof ConstantDouble)) {
+            throw new ClassFormatError();
+        }
+        if (tag == 'F' && !(constant instanceof ConstantFloat)) {
+            throw new ClassFormatError();
+        }
+        if (tag == 'J' && !(constant instanceof ConstantLong)) {
+            throw new ClassFormatError();
+        }
+        if (tag == 's' && !(constant instanceof ConstantUtf8)) {
+            throw new ClassFormatError();
+        }
     }
 }

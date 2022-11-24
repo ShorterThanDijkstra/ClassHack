@@ -62,6 +62,18 @@ public class AttributeTable {
             return LineNumberTable.parse(input, metaData);
         } else if ("LocalVariableTable".equals(name)) {
             return LocalVariableTable.parse(input, metaData);
+        } else if ("LocalVariableTypeTable".equals(name)) {
+            return LocalVariableTypeTable.parse(input, metaData);
+        } else if ("Deprecated".equals(name)) {
+            return Deprecated.parse(input, metaData);
+        } else if ("RuntimeVisibleAnnotations".equals(name)) {
+            return RuntimeVisibleAnnotations.parse(input, metaData);
+        } else if ("RuntimeInvisibleAnnotations".equals(name)) {
+            return RuntimeInvisibleAnnotations.parse(input, metaData);
+        } else if ("RuntimeVisibleParameterAnnotations".equals(name)) {
+            return RuntimeVisibleParameterAnnotations.parse(input, metaData);
+        } else if ("RuntimeInvisibleParameterAnnotations".equals(name)) {
+            return  RuntimeInvisibleParameterAnnotations.parse(input, metaData);
         } else {
             return skipped(input, name);
         }

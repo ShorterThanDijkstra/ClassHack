@@ -70,10 +70,12 @@ public class ConstantPool {
                 continue;
             }
             if (tag == CONSTANT_Long) {
+                count++;
                 parseLong(input, pool);
                 continue;
             }
             if (tag == CONSTANT_Double) {
+                count++;
                 parseDouble(input, pool);
                 continue;
             }
@@ -153,6 +155,7 @@ public class ConstantPool {
         double value = Double.longBitsToDouble(bits);
 
         pool.add(new ConstantDouble(value));
+        pool.add(new Placeholder());
     }
 
     private static void parseLong(InputStream input, List<Constant> pool) throws IOException {
@@ -160,7 +163,7 @@ public class ConstantPool {
         long value = readBytes4(input);
         value = value << 32 | readBytes4(input);
         pool.add(new ConstantLong(value));
-
+        pool.add(new Placeholder());
     }
 
     private static void parseFloat(InputStream input, List<Constant> pool) throws IOException {
@@ -213,6 +216,10 @@ public class ConstantPool {
 
     public List<Constant> getPool() {
         return pool;
+    }
+
+    public Constant get(int index) {
+        return pool.get(index);
     }
 
     public String getConstClassName(int index) {
