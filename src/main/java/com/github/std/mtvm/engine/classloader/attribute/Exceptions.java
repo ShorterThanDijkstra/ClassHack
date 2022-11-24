@@ -14,16 +14,21 @@ import static com.github.std.mtvm.engine.util.BytesReader.readBytes2;
 public final class Exceptions implements AttributeInfo {
     private final List<String> exceptions;
 
-    public Exceptions(InputStream input, ClassFile.ClassFileBuilder metaData) throws IOException {
+    private Exceptions(List<String> exceptions) {
+        this.exceptions = exceptions;
+    }
+
+    public static Exceptions parse(InputStream input, ClassFile.ClassFileBuilder metaData) throws IOException {
         getAttrLen(input);
         int exNum = readBytes2(input);
-        exceptions = new ArrayList<>(exNum);
+        List<String> exceptions = new ArrayList<>(exNum);
         for (int i = 0; i < exNum; i++) {
             int exClassIndex = readBytes2(input);
             exceptions.add(
                     checkExceptions(exClassIndex, metaData.constantPool)
             );
         }
+        return new Exceptions(exceptions);
     }
 
     public List<String> getExceptions() {

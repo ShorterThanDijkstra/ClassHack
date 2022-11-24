@@ -18,6 +18,10 @@ public final class InnerClasses implements AttributeInfo {
 
     private final List<ClassInfo> classInfos;
 
+    private InnerClasses(List<ClassInfo> classInfos) {
+        this.classInfos = classInfos;
+    }
+
     private static class ClassInfo {
         private final String innerClassName;
         private final String outerClassName;
@@ -51,16 +55,17 @@ public final class InnerClasses implements AttributeInfo {
         }
     }
 
-    public InnerClasses(InputStream input, ClassFile.ClassFileBuilder metaData) throws IOException {
+    public static InnerClasses parse(InputStream input, ClassFile.ClassFileBuilder metaData) throws IOException {
         getAttrLen(input);
         int classNum = readBytes2(input);
-        classInfos = new ArrayList<>(classNum);
+        List<ClassInfo> classInfos = new ArrayList<>(classNum);
         for (int i = 0; i < classNum; i++) {
             classInfos.add(parseClass(input, metaData));
         }
+        return new InnerClasses(classInfos);
     }
 
-    private ClassInfo parseClass(InputStream input, ClassFile.ClassFileBuilder metaData) throws IOException {
+    private static ClassInfo parseClass(InputStream input, ClassFile.ClassFileBuilder metaData) throws IOException {
         int innerClassIndex = readBytes2(input);
         String innerClassName = checkInnerClassInnerInfoIndex(innerClassIndex, metaData.constantPool);
 

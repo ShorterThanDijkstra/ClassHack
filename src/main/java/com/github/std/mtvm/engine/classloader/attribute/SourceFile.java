@@ -12,13 +12,18 @@ import static com.github.std.mtvm.engine.util.BytesReader.readBytes2;
 public final class SourceFile implements AttributeInfo {
     private final String sourceFile;
 
-    public SourceFile(InputStream input, ClassFile.ClassFileBuilder metaData) throws IOException {
+    public SourceFile(String sourceFile) {
+        this.sourceFile = sourceFile;
+    }
+
+    public static SourceFile parse(InputStream input, ClassFile.ClassFileBuilder metaData) throws IOException {
         long len = getAttrLen(input);
         if (len != 2) {
             throw new ClassFormatError();
         }
         int sourceFileIndex = readBytes2(input);
-        sourceFile = checkSourceFile(sourceFileIndex, metaData.constantPool);
+        String sourceFile = checkSourceFile(sourceFileIndex, metaData.constantPool);
+        return new SourceFile(sourceFile);
     }
 
     public String getSourceFile() {

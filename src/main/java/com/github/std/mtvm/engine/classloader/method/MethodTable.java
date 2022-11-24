@@ -13,17 +13,22 @@ import static com.github.std.mtvm.engine.util.BytesReader.byteArrayToInt;
 public class MethodTable {
     private final List<MethodInfo> methodInfos;
 
-    public MethodTable(int methodCount,
-                       InputStream input,
-                       ClassFile.ClassFileBuilder metaData) throws IOException {
-        methodInfos = new ArrayList<>(methodCount);
-        MethodInfoChecker checker = new MethodInfoChecker();
-        for (int i = 0; i < methodCount; i++) {
-            parseMethodInfo(input, metaData, checker);
-        }
+    private MethodTable(List<MethodInfo> methodInfos) {
+        this.methodInfos = methodInfos;
     }
 
-    private void parseMethodInfo(InputStream input,
+
+
+    public static MethodTable parse(int methodCount, InputStream input, ClassFile.ClassFileBuilder metaData) throws IOException {
+        List<MethodInfo> methodInfos = new ArrayList<>(methodCount);
+        MethodInfoChecker checker = new MethodInfoChecker();
+        for (int i = 0; i < methodCount; i++) {
+            methodInfos.add(parseMethodInfo(input, metaData, checker));
+        }
+        return new MethodTable(methodInfos);
+    }
+
+    private static MethodInfo parseMethodInfo(InputStream input,
                                  ClassFile.ClassFileBuilder metaData,
                                  MethodInfoChecker checker) throws IOException {
         MethodInfo.MethodInfoBuilder builder = new MethodInfo.MethodInfoBuilder();
@@ -33,10 +38,10 @@ public class MethodTable {
         parseMethodInfoDesc(input, metaData, checker, builder);
         parseMethodInfoAttr(input, metaData, builder);
 
-        methodInfos.add(builder.build());
+        return builder.build();
     }
 
-    private void parseMethodInfoAttr(InputStream input,
+    private static void parseMethodInfoAttr(InputStream input,
                                      ClassFile.ClassFileBuilder metaData,
                                      MethodInfo.MethodInfoBuilder builder) throws IOException {
         byte[] bsAttrCount = new byte[2];
@@ -44,10 +49,10 @@ public class MethodTable {
         assert read == 2;
 
         int attrCount = byteArrayToInt(bsAttrCount);
-        builder.attributeTable = new AttributeTable(attrCount, input, metaData);
+        builder.attributeTable = AttributeTable.parse(attrCount, input, metaData);
     }
 
-    private void parseMethodInfoDesc(InputStream input,
+    private static void parseMethodInfoDesc(InputStream input,
                                      ClassFile.ClassFileBuilder metaData,
                                      MethodInfoChecker checker,
                                      MethodInfo.MethodInfoBuilder builder) throws IOException {
@@ -59,7 +64,7 @@ public class MethodTable {
         builder.descriptor = checker.checkDescIndex(descIndex, metaData.constantPool);
     }
 
-    private void parseMethodInfoName(InputStream input,
+    private static void parseMethodInfoName(InputStream input,
                                      ClassFile.ClassFileBuilder metaData,
                                      MethodInfoChecker checker,
                                      MethodInfo.MethodInfoBuilder builder) throws IOException {
@@ -71,7 +76,7 @@ public class MethodTable {
         builder.name = checker.checkNameIndex(nameIndex, metaData.constantPool);
     }
 
-    private void parseMethodInfoAccessFlags(InputStream input,
+    private static void parseMethodInfoAccessFlags(InputStream input,
                                             ClassFile.ClassFileBuilder metaData,
                                             MethodInfoChecker checker,
                                             MethodInfo.MethodInfoBuilder builder) throws IOException {

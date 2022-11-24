@@ -70,7 +70,7 @@ public final class ClassReader implements Closeable {
 
     private void parseConstantPool() throws IOException {
         int constantPoolCount = readBytes2(input);
-        builder.constantPool = new ConstantPool(constantPoolCount - 1, input);
+        builder.constantPool = ConstantPool.parse(constantPoolCount - 1, input);
     }
 
     private void parseAccessFlags() throws IOException {
@@ -130,19 +130,19 @@ public final class ClassReader implements Closeable {
 
     private void parseFields() throws IOException {
         int fieldsCount = readBytes2(input);
-        builder.fieldTable = new FieldTable(fieldsCount, input, builder);
+        builder.fieldTable = FieldTable.parse(fieldsCount, input, builder);
     }
 
     private void parseMethods() throws IOException {
         int methodCount = readBytes2(input);
 
-        builder.methodTable = new MethodTable(methodCount, input, builder);
+        builder.methodTable = MethodTable.parse(methodCount, input, builder);
     }
 
     private void parseAttributes() throws IOException {
         int attrCount = readBytes2(input);
 
-        builder.attributeTable = new AttributeTable(attrCount, input, builder);
+        builder.attributeTable = AttributeTable.parse(attrCount, input, builder);
     }
 
 

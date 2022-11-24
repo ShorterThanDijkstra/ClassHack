@@ -13,6 +13,10 @@ import static com.github.std.mtvm.engine.util.BytesReader.readBytes2;
 public final class LineNumberTable implements AttributeInfo {
     private final List<Table> tables;
 
+    private LineNumberTable(List<Table> tables) {
+        this.tables = tables;
+    }
+
     public List<Table> getTables() {
         return tables;
     }
@@ -35,15 +39,16 @@ public final class LineNumberTable implements AttributeInfo {
         }
     }
 
-    public LineNumberTable(InputStream input, ClassFile.ClassFileBuilder metaData) throws IOException {
+    public static LineNumberTable parse(InputStream input, ClassFile.ClassFileBuilder metaData) throws IOException {
         getAttrLen(input);
 
         int tableLen = readBytes2(input);
-        tables = new ArrayList<>(tableLen);
+        List<Table> tables = new ArrayList<>(tableLen);
         for (int i = 0; i < tableLen; i++) {
             int startPc = readBytes2(input);
             int lineNum = readBytes2(input);
             tables.add(new Table(startPc, lineNum));
         }
+        return new LineNumberTable(tables);
     }
 }

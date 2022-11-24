@@ -14,6 +14,11 @@ public final class EnclosingMethod implements AttributeInfo {
     private final String outerClass;
     private final String outerMethod;
 
+    private EnclosingMethod(String outerClass, String outerMethod) {
+        this.outerClass = outerClass;
+        this.outerMethod = outerMethod;
+    }
+
     public String getOuterClass() {
         return outerClass;
     }
@@ -22,14 +27,15 @@ public final class EnclosingMethod implements AttributeInfo {
         return outerMethod;
     }
 
-    public EnclosingMethod(InputStream input, ClassFile.ClassFileBuilder metaData) throws IOException {
+    public static EnclosingMethod parse(InputStream input, ClassFile.ClassFileBuilder metaData) throws IOException {
         long len = getAttrLen(input);
         assert len == 4;
 
         int classIndex = readBytes2(input);
-        outerClass = checkEnclosingMethodClassIndex(classIndex, metaData.constantPool);
+        String outerClass = checkEnclosingMethodClassIndex(classIndex, metaData.constantPool);
 
         int methodIndex = readBytes2(input);
-        outerMethod = checkEnclosingMethodMethodIndex(methodIndex, metaData.constantPool);
+        String outerMethod = checkEnclosingMethodMethodIndex(methodIndex, metaData.constantPool);
+        return new EnclosingMethod(outerClass, outerMethod);
     }
 }

@@ -15,6 +15,10 @@ import static com.github.std.mtvm.engine.util.BytesReader.readBytes2;
 public final class LocalVariableTable implements AttributeInfo {
     private final List<Table> tables;
 
+    public LocalVariableTable(List<Table> tables) {
+        this.tables = tables;
+    }
+
     private static class Table {
         private final int startPc;
         private final int length;
@@ -51,17 +55,18 @@ public final class LocalVariableTable implements AttributeInfo {
         }
     }
 
-    public LocalVariableTable(InputStream input, ClassFile.ClassFileBuilder metaData) throws IOException {
+    public static LocalVariableTable parse(InputStream input, ClassFile.ClassFileBuilder metaData) throws IOException {
         getAttrLen(input);
 
         int tableLen = readBytes2(input);
-        tables = new ArrayList<>(tableLen);
+        List<Table> tables = new ArrayList<>(tableLen);
         for (int i = 0; i < tableLen; i++) {
             tables.add(parseTables(input, metaData));
         }
+        return new LocalVariableTable(tables);
     }
 
-    private Table parseTables(InputStream input, ClassFile.ClassFileBuilder metaData) throws IOException {
+    private static Table parseTables(InputStream input, ClassFile.ClassFileBuilder metaData) throws IOException {
         int startPc = readBytes2(input);
         int length = readBytes2(input);
 

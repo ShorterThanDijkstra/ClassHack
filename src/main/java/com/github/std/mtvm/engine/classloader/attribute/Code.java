@@ -72,16 +72,24 @@ public final class Code implements AttributeInfo {
         }
     }
 
-    private int parseMaxStack(InputStream input) throws IOException {
+    private Code(int maxStack, int maxLocals, byte[] opcodes, List<ExceptionInfo> exceptionTable, AttributeTable attributeTable) {
+        this.maxStack = maxStack;
+        this.maxLocals = maxLocals;
+        this.opcodes = opcodes;
+        this.exceptionTable = exceptionTable;
+        this.attributeTable = attributeTable;
+    }
+
+    private static int parseMaxStack(InputStream input) throws IOException {
         return readBytes2(input);
     }
 
-    private int parseMaxLocals(InputStream input) throws IOException {
+    private static int parseMaxLocals(InputStream input) throws IOException {
         return readBytes2(input);
 
     }
 
-    private byte[] parseOpcodes(InputStream input) throws IOException {
+    private static byte[] parseOpcodes(InputStream input) throws IOException {
         int codeLen = (int) readBytes4(input);
 
         byte[] opcodes = new byte[codeLen];
@@ -91,22 +99,23 @@ public final class Code implements AttributeInfo {
         return opcodes;
     }
 
-    public Code(InputStream input, ClassFile.ClassFileBuilder metaData) throws IOException {
+    public static Code parse(InputStream input, ClassFile.ClassFileBuilder metaData) throws IOException {
         getAttrLen(input);
-        this.maxStack = parseMaxStack(input);
-        this.maxLocals = parseMaxLocals(input);
-        this.opcodes = parseOpcodes(input);
-        this.exceptionTable = parseExceptionTable(input, metaData.constantPool);
-        this.attributeTable = parseAttrTable(input, metaData);
+        int maxStack = parseMaxStack(input);
+        int maxLocals = parseMaxLocals(input);
+        byte[] opcodes = parseOpcodes(input);
+        List<ExceptionInfo> exceptionTable = parseExceptionTable(input, metaData.constantPool);
+        AttributeTable attributeTable = parseAttrTable(input, metaData);
+        return new Code(maxStack, maxLocals, opcodes, exceptionTable, attributeTable);
     }
 
-    private AttributeTable parseAttrTable(InputStream input, ClassFile.ClassFileBuilder metaData) throws IOException {
+    private static AttributeTable parseAttrTable(InputStream input, ClassFile.ClassFileBuilder metaData) throws IOException {
 
         int attrCount = readBytes2(input);
-        return new AttributeTable(attrCount, input, metaData);
+        return AttributeTable.parse(attrCount, input, metaData);
     }
 
-    private List<ExceptionInfo> parseExceptionTable(InputStream input, ConstantPool constantPool) throws IOException {
+    private static List<ExceptionInfo> parseExceptionTable(InputStream input, ConstantPool constantPool) throws IOException {
         int tableLen = readBytes2(input);
         List<ExceptionInfo> table = new ArrayList<>(tableLen);
 
@@ -116,8 +125,8 @@ public final class Code implements AttributeInfo {
         return table;
     }
 
-    private ExceptionInfo parseExceptionInfo(InputStream input, ConstantPool constantPool) throws IOException {
-        int startPc =readBytes2(input);
+    private static ExceptionInfo parseExceptionInfo(InputStream input, ConstantPool constantPool) throws IOException {
+        int startPc = readBytes2(input);
         int endPc = readBytes2(input);
         int handlerPc = readBytes2(input);
         int cacheTypeIndex = readBytes2(input);

@@ -14,17 +14,21 @@ import static com.github.std.mtvm.engine.util.BytesReader.readBytes2;
 public class FieldTable {
     private final List<FieldInfo> fieldInfos;
 
-    public FieldTable(int fieldsCount,
-                      InputStream input,
-                      ClassFile.ClassFileBuilder metaData) throws IOException {
-        this.fieldInfos = new ArrayList<>(fieldsCount);
-        for (int i = 0; i < fieldsCount; i++) {
-            parseFieldInfo(input, metaData);
-        }
+    public FieldTable(List<FieldInfo> fieldInfos) {
+        this.fieldInfos = fieldInfos;
     }
 
-    private void parseFieldInfo(InputStream input,
-                                ClassFile.ClassFileBuilder metaData) throws IOException {
+
+    public static FieldTable parse(int fieldsCount, InputStream input, ClassFile.ClassFileBuilder metaData) throws IOException {
+        List<FieldInfo> fieldInfos = new ArrayList<>(fieldsCount);
+        for (int i = 0; i < fieldsCount; i++) {
+            fieldInfos.add(parseFieldInfo(input, metaData));
+        }
+        return new FieldTable(fieldInfos);
+    }
+
+    private static FieldInfo parseFieldInfo(InputStream input,
+                                            ClassFile.ClassFileBuilder metaData) throws IOException {
 
         FieldInfo.FieldInfoBuilder builder = new FieldInfo.FieldInfoBuilder();
 
@@ -33,12 +37,12 @@ public class FieldTable {
         parseFieldInfoDescriptor(input, metaData, builder);
         parseFieldInfoAttrs(input, metaData, builder);
 
-        fieldInfos.add(builder.build());
+        return builder.build();
     }
 
-    private void parseFieldInfoAccessFlags(InputStream input,
-                                           ClassFile.ClassFileBuilder metaData,
-                                           FieldInfo.FieldInfoBuilder builder) throws IOException {
+    private static void parseFieldInfoAccessFlags(InputStream input,
+                                                  ClassFile.ClassFileBuilder metaData,
+                                                  FieldInfo.FieldInfoBuilder builder) throws IOException {
         byte[] bsAccessFlags = new byte[2];
         int read = input.read(bsAccessFlags);
         assert read == 2;
@@ -76,25 +80,25 @@ public class FieldTable {
         builder.accessFlags = accessFlags;
     }
 
-    private void parseFieldInfoName(InputStream input,
-                                    ClassFile.ClassFileBuilder metaData,
-                                    FieldInfo.FieldInfoBuilder builder) throws IOException {
+    private static void parseFieldInfoName(InputStream input,
+                                           ClassFile.ClassFileBuilder metaData,
+                                           FieldInfo.FieldInfoBuilder builder) throws IOException {
         int nameIndex = readBytes2(input);
         builder.name = checkNameIndex(metaData.constantPool, nameIndex);
     }
 
-    private void parseFieldInfoDescriptor(InputStream input,
-                                          ClassFile.ClassFileBuilder metaData,
-                                          FieldInfo.FieldInfoBuilder builder) throws IOException {
+    private static void parseFieldInfoDescriptor(InputStream input,
+                                                 ClassFile.ClassFileBuilder metaData,
+                                                 FieldInfo.FieldInfoBuilder builder) throws IOException {
         int descIndex = readBytes2(input);
         builder.descriptor = checkDescIndex(metaData.constantPool, descIndex);
     }
 
-    private void parseFieldInfoAttrs(InputStream input,
-                                     ClassFile.ClassFileBuilder metaData,
-                                     FieldInfo.FieldInfoBuilder builder) throws IOException {
+    private static void parseFieldInfoAttrs(InputStream input,
+                                            ClassFile.ClassFileBuilder metaData,
+                                            FieldInfo.FieldInfoBuilder builder) throws IOException {
         int attrCount = readBytes2(input);
-        builder.attributeTable = new AttributeTable(attrCount, input, metaData);
+        builder.attributeTable = AttributeTable.parse(attrCount, input, metaData);
     }
 
     public List<FieldInfo> getFieldInfos() {

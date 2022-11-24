@@ -25,71 +25,76 @@ public class ConstantPool {
 
     private final List<Constant> pool;
 
-    public ConstantPool(int poolSize, InputStream input) throws IOException {
-        this.pool = new ArrayList<>(poolSize);
-        parseData(poolSize, input);
+    private ConstantPool(List<Constant> pool) {
+        this.pool = pool;
     }
 
-    private void parseData(int poolSize, InputStream input) throws IOException {
+    public static ConstantPool parse(int poolSize, InputStream input) throws IOException {
+        List<Constant> pool = new ArrayList<>(poolSize);
+        parseData(poolSize, input, pool);
+        return new ConstantPool(pool);
+    }
+
+    private static void parseData(int poolSize, InputStream input, List<Constant> pool) throws IOException {
         int count = 0;
 
         while (count < poolSize) {
             int tag = input.read();
             count++;
             if (tag == CONSTANT_Class) {
-                parseClass(input);
+                parseClass(input, pool);
                 continue;
             }
             if (tag == CONSTANT_Fieldref) {
-                parseFieldRef(input);
+                parseFieldRef(input, pool);
                 continue;
             }
             if (tag == CONSTANT_Methodref) {
-                parseMethodRef(input);
+                parseMethodRef(input, pool);
                 continue;
             }
             if (tag == CONSTANT_InterfaceMethodref) {
-                parseInterfaceMethodRef(input);
+                parseInterfaceMethodRef(input, pool);
                 continue;
             }
             if (tag == CONSTANT_String) {
-                parseString(input);
+                parseString(input, pool);
                 continue;
             }
             if (tag == CONSTANT_Integer) {
-                parseInteger(input);
+                parseInteger(input, pool);
                 continue;
             }
             if (tag == CONSTANT_Float) {
-                parseFloat(input);
+                parseFloat(input, pool);
                 continue;
             }
             if (tag == CONSTANT_Long) {
-                parseLong(input);
+                parseLong(input, pool);
                 continue;
             }
             if (tag == CONSTANT_Double) {
-                parseDouble(input);
+                parseDouble(input, pool);
                 continue;
             }
             if (tag == CONSTANT_NameAndType) {
-                parseNameAndType(input);
+                parseNameAndType(input, pool);
                 continue;
             }
             if (tag == CONSTANT_Utf8) {
-                parseUtf8(input);
+                parseUtf8(input, pool);
                 continue;
             }
             if (tag == CONSTANT_MethodHandle) {
-                parseMethodHandle(input);
+                parseMethodHandle(input, pool);
                 continue;
             }
             if (tag == CONSTANT_MethodType) {
-                parseMethodType(input);
+                parseMethodType(input, pool);
                 continue;
             }
             if (tag == CONSTANT_InvokeDynamic) {
-                parseInvokeDynamic(input);
+                parseInvokeDynamic(input, pool);
                 continue;
             }
             throw new ClassFormatError("Unsupported Constant Pool Tag");
@@ -97,7 +102,7 @@ public class ConstantPool {
     }
 
 
-    private void parseInvokeDynamic(InputStream input) throws IOException {
+    private static void parseInvokeDynamic(InputStream input, List<Constant> pool) throws IOException {
         int bootIndex = readBytes2(input);
         int nameAndTypeIndex = readBytes2(input);
         pool.add(new ConstantInvokeDynamic(
@@ -105,12 +110,12 @@ public class ConstantPool {
         ));
     }
 
-    private void parseMethodType(InputStream input) throws IOException {
+    private static void parseMethodType(InputStream input, List<Constant> pool) throws IOException {
         int descIndex = readBytes2(input);
         pool.add(new ConstantMethodType(descIndex));
     }
 
-    private void parseMethodHandle(InputStream input) throws IOException {
+    private static void parseMethodHandle(InputStream input, List<Constant> pool) throws IOException {
         int refKind = readByte(input);
         assert refKind <= 9 && refKind >= 1;
 
@@ -121,7 +126,7 @@ public class ConstantPool {
         ));
     }
 
-    private void parseUtf8(InputStream input) throws IOException {
+    private static void parseUtf8(InputStream input, List<Constant> pool) throws IOException {
         int len = readBytes2(input);
         byte[] bsUtf8 = new byte[len];
         int read = input.read(bsUtf8);
@@ -132,7 +137,7 @@ public class ConstantPool {
         pool.add(new ConstantUtf8(value));
     }
 
-    private void parseNameAndType(InputStream input) throws IOException {
+    private static void parseNameAndType(InputStream input, List<Constant> pool) throws IOException {
         int nameIndex = readBytes2(input);
         int descIndex = readBytes2(input);
         pool.add(new ConstantNameAndType(
@@ -141,7 +146,7 @@ public class ConstantPool {
         ));
     }
 
-    private void parseDouble(InputStream input) throws IOException {
+    private static void parseDouble(InputStream input, List<Constant> pool) throws IOException {
 
         long bits = readBytes4(input);
         bits = bits << 32 | readBytes4(input);
@@ -150,7 +155,7 @@ public class ConstantPool {
         pool.add(new ConstantDouble(value));
     }
 
-    private void parseLong(InputStream input) throws IOException {
+    private static void parseLong(InputStream input, List<Constant> pool) throws IOException {
 
         long value = readBytes4(input);
         value = value << 32 | readBytes4(input);
@@ -158,23 +163,23 @@ public class ConstantPool {
 
     }
 
-    private void parseFloat(InputStream input) throws IOException {
+    private static void parseFloat(InputStream input, List<Constant> pool) throws IOException {
         int bits = (int) readBytes4(input);
         float value = Float.intBitsToFloat(bits);
         pool.add(new ConstantFloat(value));
     }
 
-    private void parseInteger(InputStream input) throws IOException {
+    private static void parseInteger(InputStream input, List<Constant> pool) throws IOException {
         int value = (int) readBytes4(input);
         pool.add(new ConstantInteger(value));
     }
 
-    private void parseString(InputStream input) throws IOException {
+    private static void parseString(InputStream input, List<Constant> pool) throws IOException {
         int strIndex = readBytes2(input);
         pool.add(new ConstantString(strIndex));
     }
 
-    private void parseInterfaceMethodRef(InputStream input) throws IOException {
+    private static void parseInterfaceMethodRef(InputStream input, List<Constant> pool) throws IOException {
         int classIndex = readBytes2(input);
         int nameAndTypeIndex = readBytes2(input);
         pool.add(new ConstantInterfaceMethodRef(
@@ -183,7 +188,7 @@ public class ConstantPool {
         ));
     }
 
-    private void parseMethodRef(InputStream input) throws IOException {
+    private static void parseMethodRef(InputStream input, List<Constant> pool) throws IOException {
         int classIndex = readBytes2(input);
         int nameAndTypeIndex = readBytes2(input);
         pool.add(new ConstantMethodRef(
@@ -192,7 +197,7 @@ public class ConstantPool {
         ));
     }
 
-    private void parseFieldRef(InputStream input) throws IOException {
+    private static void parseFieldRef(InputStream input, List<Constant> pool) throws IOException {
         int classIndex = readBytes2(input);
         int nameAndTypeIndex = readBytes2(input);
         pool.add(new ConstantFieldRef(
@@ -201,7 +206,7 @@ public class ConstantPool {
         ));
     }
 
-    private void parseClass(InputStream input) throws IOException {
+    private static void parseClass(InputStream input, List<Constant> pool) throws IOException {
         int nameIndex = readBytes2(input);
         pool.add(new ConstantClass(nameIndex));
     }

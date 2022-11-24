@@ -19,54 +19,64 @@ public class AttributeTable {
         return readBytes4(input);
     }
 
-    public AttributeTable(int attrCount, InputStream input, ClassFile.ClassFileBuilder metaData) throws IOException {
-        attributes = new ArrayList<>(attrCount);
-        for (int i = 0; i < attrCount; i++) {
-            parseAttr(input, metaData);
-        }
+    private AttributeTable(List<AttributeInfo> attributes) {
+        this.attributes = attributes;
     }
 
-    private void parseAttr(InputStream input,
-                           ClassFile.ClassFileBuilder metaData) throws IOException {
+
+    public static AttributeTable parse(int attrCount, InputStream input, ClassFile.ClassFileBuilder metaData) throws IOException {
+        List<AttributeInfo> attributes = new ArrayList<>(attrCount);
+        for (int i = 0; i < attrCount; i++) {
+            AttributeInfo attr = parseAttr(input, metaData);
+            if (!(attr instanceof Unknown)) {
+                attributes.add(attr);
+            }
+        }
+        return new AttributeTable(attributes);
+    }
+
+    private static AttributeInfo parseAttr(InputStream input,
+                                           ClassFile.ClassFileBuilder metaData) throws IOException {
         String name = getAttrName(input, metaData.constantPool);
         if ("ConstantValue".equals(name)) {
-            attributes.add(new ConstantValue(input, metaData));
+            return ConstantValue.parse(input, metaData);
         } else if ("Code".equals(name)) {
-            attributes.add(new Code(input, metaData));
+            return Code.parse(input, metaData);
         } else if ("StackMapTable".equals(name)) {
-            attributes.add(new StackMapTable(input, metaData));
+            return StackMapTable.parse(input, metaData);
         } else if ("Exceptions".equals(name)) {
-            attributes.add(new Exceptions(input, metaData));
+            return Exceptions.parse(input, metaData);
         } else if ("InnerClasses".equals(name)) {
-            attributes.add(new InnerClasses(input, metaData));
+            return InnerClasses.parse(input, metaData);
         } else if ("EnclosingMethod".equals(name)) {
-            attributes.add(new EnclosingMethod(input, metaData));
+            return EnclosingMethod.parse(input, metaData);
         } else if ("Synthetic".equals(name)) {
-            attributes.add(new Synthetic(input, metaData));
+            return Synthetic.parse(input, metaData);
         } else if ("Signature".equals(name)) {
-            attributes.add(new Signature(input, metaData));
+            return Signature.parse(input, metaData);
         } else if ("SourceFile".equals(name)) {
-            attributes.add(new SourceFile(input, metaData));
+            return SourceFile.parse(input, metaData);
         } else if ("SourceDebugExtension".equals(name)) {
-            attributes.add(new SourceDebugExtension(input, metaData));
+            return SourceDebugExtension.parse(input, metaData);
         } else if ("LineNumberTable".equals(name)) {
-            attributes.add(new LineNumberTable(input, metaData));
+            return LineNumberTable.parse(input, metaData);
         } else if ("LocalVariableTable".equals(name)) {
-            attributes.add(new LocalVariableTable(input, metaData));
+            return LocalVariableTable.parse(input, metaData);
         } else {
-            info("Unknown attribute: " + name + ", skipped");
-            skip(input);
+            return skipped(input, name);
         }
     }
 
-    private void skip(InputStream input) throws IOException {
+    private static AttributeInfo skipped(InputStream input, String name) throws IOException {
+        info("Unknown attribute: " + name + ", skipped");
         long length = getAttrLen(input);
         long skipped = input.skip(length);
         assert skipped == length;
+        return new Unknown(name);
     }
 
-    private String getAttrName(InputStream input,
-                               ConstantPool constantPool) throws IOException {
+    private static String getAttrName(InputStream input,
+                                      ConstantPool constantPool) throws IOException {
         int nameIndex = readBytes2(input);
         return constantPool.getUtf8Str(nameIndex);
     }

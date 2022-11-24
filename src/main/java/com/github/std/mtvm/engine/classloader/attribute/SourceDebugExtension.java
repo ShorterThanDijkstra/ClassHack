@@ -10,14 +10,18 @@ import static com.github.std.mtvm.engine.classloader.attribute.AttributeTable.ge
 public final class SourceDebugExtension implements AttributeInfo {
     private final String debugExtension;
 
-    public SourceDebugExtension(InputStream input, ClassFile.ClassFileBuilder metaData) throws IOException {
+    public SourceDebugExtension(String debugExtension) {
+        this.debugExtension = debugExtension;
+    }
+
+    public static SourceDebugExtension parse(InputStream input, ClassFile.ClassFileBuilder metaData) throws IOException {
         int len = (int) getAttrLen(input);
 
         byte[] bytes = new byte[len];
         int read = input.read(bytes);
         assert read == len;
 
-        debugExtension = new String(bytes);
+        return new SourceDebugExtension(new String(bytes));
     }
 
     public String getDebugExtension() {

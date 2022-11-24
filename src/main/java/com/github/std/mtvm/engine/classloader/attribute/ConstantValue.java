@@ -13,14 +13,19 @@ import static com.github.std.mtvm.engine.util.BytesReader.readBytes2;
 public final class ConstantValue implements AttributeInfo {
     private final Constant value;
 
-    public ConstantValue(InputStream input, ClassFile.ClassFileBuilder metaData) throws IOException {
+    public ConstantValue(Constant value) {
+        this.value = value;
+    }
+
+    public static AttributeInfo parse(InputStream input, ClassFile.ClassFileBuilder metaData) throws IOException {
         long length = getAttrLen(input);
         if (length != 2) {
             throw new ClassFormatError();
         }
         int constIndex = readBytes2(input);
 
-        this.value = checkConstantValue(constIndex, metaData.constantPool);
+        Constant value = checkConstantValue(constIndex, metaData.constantPool);
+        return new ConstantValue(value);
     }
 
     public Constant getValue() {
