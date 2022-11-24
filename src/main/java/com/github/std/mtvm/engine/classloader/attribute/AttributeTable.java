@@ -76,6 +76,8 @@ public class AttributeTable {
             return RuntimeInvisibleParameterAnnotations.parse(input, metaData);
         } else if ("RuntimeVisibleTypeAnnotations".equals(name)) {
             return RuntimeVisibleTypeAnnotations.parse(input, metaData);
+        } else if ("RuntimeInvisibleTypeAnnotations".equals(name)) {
+            return RuntimeInvisibleTypeAnnotations.parse(input, metaData);
         } else {
             return skipped(input, name);
         }
