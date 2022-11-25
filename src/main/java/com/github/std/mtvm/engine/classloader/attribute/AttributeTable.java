@@ -78,6 +78,12 @@ public class AttributeTable {
             return RuntimeVisibleTypeAnnotations.parse(input, metaData);
         } else if ("RuntimeInvisibleTypeAnnotations".equals(name)) {
             return RuntimeInvisibleTypeAnnotations.parse(input, metaData);
+        } else if ("AnnotationDefault".equals(name)) {
+            return AnnotationDefault.parse(input, metaData);
+        } else if ("BootstrapMethods".equals(name)) {
+            return BootstrapMethods.parse(input, metaData);
+        } else if ("MethodParameters".equals(name)) {
+            return MethodParameters.parse(input, metaData);
         } else {
             return skipped(input, name);
         }

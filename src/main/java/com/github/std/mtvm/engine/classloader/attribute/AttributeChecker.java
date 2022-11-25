@@ -108,4 +108,28 @@ public class AttributeChecker {
             throw new ClassFormatError();
         }
     }
+
+    public static ConstantMethodHandle checkBootstrapMethodsMethodRef(int index, ConstantPool constantPool) {
+        Constant constant = constantPool.get(index - 1);
+        if (!(constant instanceof ConstantMethodHandle)) {
+            throw new ClassFormatError();
+        }
+        return (ConstantMethodHandle) constant;
+    }
+
+    public static Constant checkBootstrapMethodsArgument(int index, ConstantPool constantPool) {
+        Constant constant = constantPool.get(index - 1);
+        if (!(constant instanceof ConstantString ||
+                constant instanceof ConstantClass ||
+                constant instanceof ConstantInteger ||
+                constant instanceof ConstantLong ||
+                constant instanceof ConstantFloat ||
+                constant instanceof ConstantDouble ||
+                constant instanceof ConstantMethodHandle ||
+                constant instanceof ConstantMethodType)) {
+            throw new ClassFormatError();
+        }
+        return constant;
+    }
+
 }
