@@ -26,7 +26,6 @@ public final class ClassReader implements Closeable {
         }
         input.close();
     }
-
     public ClassReader(InputStream input) throws IOException {
         this.input = input;
         this.builder = new ClassFile.ClassFileBuilder();
@@ -36,7 +35,6 @@ public final class ClassReader implements Closeable {
 
         close();
     }
-
     private void parseClassFile() throws IOException {
         parseMagicNum();
         parseMinorVersion();
