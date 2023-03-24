@@ -1,0 +1,103 @@
+public static Opcode parse(byte[] values, int pos) {
+    byte value = values[pos];
+    if((value & 0xff) == 0x32) {
+        return new Opcode("aaload", value);
+    }
+    if((value & 0xff) == 0x53) {
+        return new Opcode("aastore", value);
+    }
+    if((value & 0xff) == 0x1) {
+        return new Opcode("aconst_null", value);
+    }
+    if((value & 0xff) == 0x19) {
+        return new Opcode("aload", value, new byte[]{values[pos + 1]});
+    }
+    if((value & 0xff) == 0x2a) {
+        return new Opcode("aload_0", value);
+    }
+    if((value & 0xff) == 0x2b) {
+        return new Opcode("aload_1", value);
+    }
+    if((value & 0xff) == 0x2c) {
+        return new Opcode("aload_2", value);
+    }
+    if((value & 0xff) == 0x2d) {
+        return new Opcode("aload_3", value);
+    }
+    if((value & 0xff) == 0xbd) {
+        return new Opcode("anewarray", value, new byte[]{values[pos + 1], values[pos + 2]});
+    }
+    if((value & 0xff) == 0xb0) {
+        return new Opcode("areturn", value);
+    }
+    if((value & 0xff) == 0xbe) {
+        return new Opcode("arraylength", value);
+    }
+    if((value & 0xff) == 0x3a) {
+        return new Opcode("astore", value, new byte[]{values[pos + 1]});
+    }
+    if((value & 0xff) == 0x4c) {
+        return new Opcode("astore_1", value);
+    }
+    if((value & 0xff) == 0x4d) {
+        return new Opcode("astore_2", value);
+    }
+    if((value & 0xff) == 0x4e) {
+        return new Opcode("astore_3", value);
+    }
+    if((value & 0xff) == 0xbf) {
+        return new Opcode("athrow", value);
+    }
+    if((value & 0xff) == 0x33) {
+        return new Opcode("baload", value);
+    }
+    if((value & 0xff) == 0x54) {
+        return new Opcode("bastore", value);
+    }
+    if((value & 0xff) == 0x10) {
+        return new Opcode("bipush", value, new byte[]{values[pos + 1]});
+    }
+    if((value & 0xff) == 0x34) {
+        return new Opcode("caload", value);
+    }
+    if((value & 0xff) == 0x55) {
+        return new Opcode("castore", value);
+    }
+    if((value & 0xff) == 0xc0) {
+        return new Opcode("checkcast", value, new byte[]{values[pos + 1], values[pos + 2]});
+    }
+    if((value & 0xff) == 0x90) {
+        return new Opcode("d2f", value);
+    }
+    if((value & 0xff) == 0x8e) {
+        return new Opcode("d2i", value);
+    }
+    if((value & 0xff) == 0x8f) {
+        return new Opcode("d2l", value);
+    }
+    if((value & 0xff) == 0x63) {
+        return new Opcode("dadd", value);
+    }
+    if((value & 0xff) == 0x31) {
+        return new Opcode("daload", value);
+    }
+    if((value & 0xff) == 0x52) {
+        return new Opcode("dastore", value);
+    }
+    if((value & 0xff) == 0x98) {
+        return new Opcode("dcmpg", value);
+    }
+    if((value & 0xff) == 0x97) {
+        return new Opcode("dcmpl", value);
+    }
+    if((value & 0xff) == 0xe) {
+        return new Opcode("dconst_0", value);
+    }
+    if((value & 0xff) == 0xf) {
+        return new Opcode("dconst_1", value);
+    }
+    if((value & 0xff) == 0x6f) {
+        return new Opcode("ddiv", value);
+    }
+    throw new ClassFormatError("Unknown Opcode: " + Integer.toHexString(value & 0xff));
+}

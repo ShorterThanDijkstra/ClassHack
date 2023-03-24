@@ -42,19 +42,19 @@ public final class Code implements AttributeInfo {
         return attributeTable;
     }
 
-    private static class Opcode {
+    public static class Opcode {
         private static final byte[] EMPTY_OPERANDS = new byte[0];
         private final String mnemonic;
         private final byte value;
         private final byte[] operands;
 
-        private Opcode(String mnemonic, byte value, byte[] operands) {
+        public Opcode(String mnemonic, byte value, byte[] operands) {
             this.mnemonic = mnemonic;
             this.value = value;
             this.operands = operands;
         }
 
-        private Opcode(String mnemonic, byte value) {
+        public Opcode(String mnemonic, byte value) {
             this.mnemonic = mnemonic;
             this.value = value;
             this.operands = EMPTY_OPERANDS;
@@ -111,7 +111,7 @@ public final class Code implements AttributeInfo {
                 return new Opcode("astore_0", value);
             }
             if ((value & 0xff) == 0x4c) {
-                return new Opcode("astroe_1", value);
+                return new Opcode("astore_1", value);
             }
             if ((value & 0xff) == 0x4d) {
                 return new Opcode("astore_2", value);
