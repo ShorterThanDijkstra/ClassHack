@@ -13,12 +13,12 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class ClassReaderTest {
+class Class0Test {
     private ClassFile classFile;
 
     @BeforeEach
     void setUp() throws IOException {
-        String file = "target/classes/com/github/std/classhack/engine/classloader/ClassReader.class";
+        String file = "target/test-classes/com/github/std/classhack/engine/classloader/Class0.class";
         ClassReader classReader = new ClassReader(Files.newInputStream(Paths.get(file)));
         classFile = classReader.getClassFile();
     }
@@ -46,7 +46,7 @@ class ClassReaderTest {
     @Test
     void thisClass() {
         String thisClass = classFile.getThisClass();
-        assertEquals("com/github/std/classhack/engine/classloader/ClassReader", thisClass);
+        assertEquals("com/github/std/classhack/engine/classloader/Class0", thisClass);
     }
 
     @Test

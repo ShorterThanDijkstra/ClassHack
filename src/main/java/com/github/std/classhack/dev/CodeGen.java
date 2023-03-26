@@ -24,7 +24,8 @@ public class CodeGen {
 
     /*
       generate codes for com.github.std.classhack.engine.classloader.attribute.Code.Opcode.parse(byte[] values, int pos)
-      which parses bytecode array
+      which parses bytecode array.
+      exception: lookupswitch, tableswitch, wide
      */
     public void genOpcodeParser() {
         final String OPCODES_DEFINE_FILE = "src/main/java/com/github/std/classhack/dev/opcodes.txt";
@@ -48,7 +49,7 @@ public class CodeGen {
 
                 writer.write("    if((value & 0xff) == " + value + ") {\n");
                 if (after == 0) {
-                    writer.write("        return new Opcode(\"" + mnemonic + "\", value);\n");
+                    writer.write("        return new FixLengthOpcode(\"" + mnemonic + "\", value);\n");
                 } else {
                     operandsBuilder.append("new byte[]{");
                     for (int i = 1; i <= after; i++) {
@@ -58,7 +59,7 @@ public class CodeGen {
                         }
                     }
                     operandsBuilder.append("}");
-                    writer.write("        return new Opcode(\"" + mnemonic + "\", value, " + operandsBuilder + ");\n");
+                    writer.write("        return new FixLengthOpcode(\"" + mnemonic + "\", value, " + operandsBuilder + ");\n");
                     operandsBuilder.setLength(0);
                 }
 

@@ -111,11 +111,11 @@ public final class ClassFile {
         return interfaces;
     }
 
-    public FieldTable getFieldInfo() {
+    public FieldTable getFieldTable() {
         return fieldTable;
     }
 
-    public MethodTable getMethodInfo() {
+    public MethodTable getMethodTable() {
         return methodTable;
     }
 

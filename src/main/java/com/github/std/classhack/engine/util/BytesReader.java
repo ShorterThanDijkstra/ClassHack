@@ -4,10 +4,10 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public class BytesReader {
-    public static long byteArrayToLong(byte[] bs) throws IOException {
+    public static long byteArrayToLong(byte[] bs) {
         long res = 0;
         for (byte b : bs) {
-            res = res << 8 | (b & 0Xff);
+            res = res << 8 | (b & 0XFF);
         }
         return res;
     }
@@ -16,6 +16,14 @@ public class BytesReader {
         int res = 0;
         for (byte b : bs) {
             res = res << 8 | (b & 0XFF);
+        }
+        return res;
+    }
+
+    public static int byteArrayToInt(byte[] bs, int start, int len) {
+        int res = 0;
+        for (int i = start; i < start + len; i++) {
+            res = res << 8 | (bs[i] & 0XFF);
         }
         return res;
     }
