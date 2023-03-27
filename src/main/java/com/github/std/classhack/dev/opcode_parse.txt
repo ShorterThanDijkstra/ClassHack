@@ -1,595 +1,397 @@
-public static Opcode parse(byte[] values, int pos) {
-    byte value = values[pos];
+{
     if((value & 0xff) == 0x32) {
-        return new Opcode("aaload", value);
-    }
+        return new FixLengthOpcode("aaload", value, pos);
     if((value & 0xff) == 0x53) {
-        return new Opcode("aastore", value);
-    }
+        return new FixLengthOpcode("aastore", value, pos);
     if((value & 0xff) == 0x1) {
-        return new Opcode("aconst_null", value);
-    }
+        return new FixLengthOpcode("aconst_null", value, pos);
     if((value & 0xff) == 0x19) {
-        return new Opcode("aload", value, new byte[]{values[pos + 1]});
-    }
+        return new FixLengthOpcode("aload", value, new byte[]{values[pos + 1]},pos);
     if((value & 0xff) == 0x2a) {
-        return new Opcode("aload_0", value);
-    }
+        return new FixLengthOpcode("aload_0", value, pos);
     if((value & 0xff) == 0x2b) {
-        return new Opcode("aload_1", value);
-    }
+        return new FixLengthOpcode("aload_1", value, pos);
     if((value & 0xff) == 0x2c) {
-        return new Opcode("aload_2", value);
-    }
+        return new FixLengthOpcode("aload_2", value, pos);
     if((value & 0xff) == 0x2d) {
-        return new Opcode("aload_3", value);
-    }
+        return new FixLengthOpcode("aload_3", value, pos);
     if((value & 0xff) == 0xbd) {
-        return new Opcode("anewarray", value, new byte[]{values[pos + 1], values[pos + 2]});
-    }
+        return new FixLengthOpcode("anewarray", value, new byte[]{values[pos + 1], values[pos + 2]},pos);
     if((value & 0xff) == 0xb0) {
-        return new Opcode("areturn", value);
-    }
+        return new FixLengthOpcode("areturn", value, pos);
     if((value & 0xff) == 0xbe) {
-        return new Opcode("arraylength", value);
-    }
+        return new FixLengthOpcode("arraylength", value, pos);
     if((value & 0xff) == 0x3a) {
-        return new Opcode("astore", value, new byte[]{values[pos + 1]});
-    }
+        return new FixLengthOpcode("astore", value, new byte[]{values[pos + 1]},pos);
     if((value & 0xff) == 0x4c) {
-        return new Opcode("astore_1", value);
-    }
+        return new FixLengthOpcode("astore_1", value, pos);
     if((value & 0xff) == 0x4d) {
-        return new Opcode("astore_2", value);
-    }
+        return new FixLengthOpcode("astore_2", value, pos);
     if((value & 0xff) == 0x4e) {
-        return new Opcode("astore_3", value);
-    }
+        return new FixLengthOpcode("astore_3", value, pos);
     if((value & 0xff) == 0xbf) {
-        return new Opcode("athrow", value);
-    }
+        return new FixLengthOpcode("athrow", value, pos);
     if((value & 0xff) == 0x33) {
-        return new Opcode("baload", value);
-    }
+        return new FixLengthOpcode("baload", value, pos);
     if((value & 0xff) == 0x54) {
-        return new Opcode("bastore", value);
-    }
+        return new FixLengthOpcode("bastore", value, pos);
     if((value & 0xff) == 0x10) {
-        return new Opcode("bipush", value, new byte[]{values[pos + 1]});
-    }
+        return new FixLengthOpcode("bipush", value, new byte[]{values[pos + 1]},pos);
     if((value & 0xff) == 0x34) {
-        return new Opcode("caload", value);
-    }
+        return new FixLengthOpcode("caload", value, pos);
     if((value & 0xff) == 0x55) {
-        return new Opcode("castore", value);
-    }
+        return new FixLengthOpcode("castore", value, pos);
     if((value & 0xff) == 0xc0) {
-        return new Opcode("checkcast", value, new byte[]{values[pos + 1], values[pos + 2]});
-    }
+        return new FixLengthOpcode("checkcast", value, new byte[]{values[pos + 1], values[pos + 2]},pos);
     if((value & 0xff) == 0x90) {
-        return new Opcode("d2f", value);
-    }
+        return new FixLengthOpcode("d2f", value, pos);
     if((value & 0xff) == 0x8e) {
-        return new Opcode("d2i", value);
-    }
+        return new FixLengthOpcode("d2i", value, pos);
     if((value & 0xff) == 0x8f) {
-        return new Opcode("d2l", value);
-    }
+        return new FixLengthOpcode("d2l", value, pos);
     if((value & 0xff) == 0x63) {
-        return new Opcode("dadd", value);
-    }
+        return new FixLengthOpcode("dadd", value, pos);
     if((value & 0xff) == 0x31) {
-        return new Opcode("daload", value);
-    }
+        return new FixLengthOpcode("daload", value, pos);
     if((value & 0xff) == 0x52) {
-        return new Opcode("dastore", value);
-    }
+        return new FixLengthOpcode("dastore", value, pos);
     if((value & 0xff) == 0x98) {
-        return new Opcode("dcmpg", value);
-    }
+        return new FixLengthOpcode("dcmpg", value, pos);
     if((value & 0xff) == 0x97) {
-        return new Opcode("dcmpl", value);
-    }
+        return new FixLengthOpcode("dcmpl", value, pos);
     if((value & 0xff) == 0xe) {
-        return new Opcode("dconst_0", value);
-    }
+        return new FixLengthOpcode("dconst_0", value, pos);
     if((value & 0xff) == 0xf) {
-        return new Opcode("dconst_1", value);
-    }
+        return new FixLengthOpcode("dconst_1", value, pos);
     if((value & 0xff) == 0x6f) {
-        return new Opcode("ddiv", value);
-    }
+        return new FixLengthOpcode("ddiv", value, pos);
     if((value & 0xff) == 0x18) {
-        return new Opcode("dload", value, new byte[]{values[pos + 1]});
-    }
+        return new FixLengthOpcode("dload", value, new byte[]{values[pos + 1]},pos);
     if((value & 0xff) == 0x26) {
-        return new Opcode("dload_0", value);
-    }
+        return new FixLengthOpcode("dload_0", value, pos);
     if((value & 0xff) == 0x27) {
-        return new Opcode("dload_1", value);
-    }
+        return new FixLengthOpcode("dload_1", value, pos);
     if((value & 0xff) == 0x28) {
-        return new Opcode("dload_2", value);
-    }
+        return new FixLengthOpcode("dload_2", value, pos);
     if((value & 0xff) == 0x29) {
-        return new Opcode("dload_3", value);
-    }
+        return new FixLengthOpcode("dload_3", value, pos);
     if((value & 0xff) == 0x6b) {
-        return new Opcode("dmul", value);
-    }
+        return new FixLengthOpcode("dmul", value, pos);
     if((value & 0xff) == 0x77) {
-        return new Opcode("dneg", value);
-    }
+        return new FixLengthOpcode("dneg", value, pos);
     if((value & 0xff) == 0x73) {
-        return new Opcode("drem", value);
-    }
+        return new FixLengthOpcode("drem", value, pos);
     if((value & 0xff) == 0xaf) {
-        return new Opcode("dreturn", value);
-    }
+        return new FixLengthOpcode("dreturn", value, pos);
     if((value & 0xff) == 0x39) {
-        return new Opcode("dstore", value, new byte[]{values[pos + 1]});
-    }
+        return new FixLengthOpcode("dstore", value, new byte[]{values[pos + 1]},pos);
     if((value & 0xff) == 0x47) {
-        return new Opcode("dstore_0", value);
-    }
+        return new FixLengthOpcode("dstore_0", value, pos);
     if((value & 0xff) == 0x48) {
-        return new Opcode("dstore_1", value);
-    }
+        return new FixLengthOpcode("dstore_1", value, pos);
     if((value & 0xff) == 0x49) {
-        return new Opcode("dstore_2", value);
-    }
+        return new FixLengthOpcode("dstore_2", value, pos);
     if((value & 0xff) == 0x4a) {
-        return new Opcode("dstore_3", value);
-    }
+        return new FixLengthOpcode("dstore_3", value, pos);
     if((value & 0xff) == 0x67) {
-        return new Opcode("dsub", value);
-    }
+        return new FixLengthOpcode("dsub", value, pos);
     if((value & 0xff) == 0x59) {
-        return new Opcode("dup", value);
-    }
+        return new FixLengthOpcode("dup", value, pos);
     if((value & 0xff) == 0x5a) {
-        return new Opcode("dup_x1", value);
-    }
+        return new FixLengthOpcode("dup_x1", value, pos);
     if((value & 0xff) == 0x5b) {
-        return new Opcode("dup_x2", value);
-    }
+        return new FixLengthOpcode("dup_x2", value, pos);
     if((value & 0xff) == 0x5c) {
-        return new Opcode("dup2", value);
-    }
+        return new FixLengthOpcode("dup2", value, pos);
     if((value & 0xff) == 0x5d) {
-        return new Opcode("dup2_x1", value);
-    }
+        return new FixLengthOpcode("dup2_x1", value, pos);
     if((value & 0xff) == 0x5e) {
-        return new Opcode("dup2_x2", value);
-    }
+        return new FixLengthOpcode("dup2_x2", value, pos);
     if((value & 0xff) == 0x8d) {
-        return new Opcode("f2d", value);
-    }
+        return new FixLengthOpcode("f2d", value, pos);
     if((value & 0xff) == 0x8b) {
-        return new Opcode("f2i", value);
-    }
+        return new FixLengthOpcode("f2i", value, pos);
     if((value & 0xff) == 0x8c) {
-        return new Opcode("f2l", value);
-    }
+        return new FixLengthOpcode("f2l", value, pos);
     if((value & 0xff) == 0x62) {
-        return new Opcode("fadd", value);
-    }
+        return new FixLengthOpcode("fadd", value, pos);
     if((value & 0xff) == 0x30) {
-        return new Opcode("faload", value);
-    }
+        return new FixLengthOpcode("faload", value, pos);
     if((value & 0xff) == 0x51) {
-        return new Opcode("fastore", value);
-    }
+        return new FixLengthOpcode("fastore", value, pos);
     if((value & 0xff) == 0x96) {
-        return new Opcode("fcmpg", value);
-    }
+        return new FixLengthOpcode("fcmpg", value, pos);
     if((value & 0xff) == 0x95) {
-        return new Opcode("fcmpl", value);
-    }
+        return new FixLengthOpcode("fcmpl", value, pos);
     if((value & 0xff) == 0xb) {
-        return new Opcode("fconst_0", value);
-    }
+        return new FixLengthOpcode("fconst_0", value, pos);
     if((value & 0xff) == 0xc) {
-        return new Opcode("fconst_1", value);
-    }
+        return new FixLengthOpcode("fconst_1", value, pos);
     if((value & 0xff) == 0xd) {
-        return new Opcode("fconst_2", value);
-    }
+        return new FixLengthOpcode("fconst_2", value, pos);
     if((value & 0xff) == 0x6e) {
-        return new Opcode("fdiv", value);
-    }
+        return new FixLengthOpcode("fdiv", value, pos);
     if((value & 0xff) == 0x17) {
-        return new Opcode("fload", value, new byte[]{values[pos + 1]});
-    }
+        return new FixLengthOpcode("fload", value, new byte[]{values[pos + 1]},pos);
     if((value & 0xff) == 0x22) {
-        return new Opcode("fload_0", value);
-    }
+        return new FixLengthOpcode("fload_0", value, pos);
     if((value & 0xff) == 0x23) {
-        return new Opcode("fload_1", value);
-    }
+        return new FixLengthOpcode("fload_1", value, pos);
     if((value & 0xff) == 0x24) {
-        return new Opcode("fload_2", value);
-    }
+        return new FixLengthOpcode("fload_2", value, pos);
     if((value & 0xff) == 0x25) {
-        return new Opcode("fload_3", value);
-    }
+        return new FixLengthOpcode("fload_3", value, pos);
     if((value & 0xff) == 0x6a) {
-        return new Opcode("fmul", value);
-    }
+        return new FixLengthOpcode("fmul", value, pos);
     if((value & 0xff) == 0x76) {
-        return new Opcode("fneg", value);
-    }
+        return new FixLengthOpcode("fneg", value, pos);
     if((value & 0xff) == 0x72) {
-        return new Opcode("frem", value);
-    }
+        return new FixLengthOpcode("frem", value, pos);
     if((value & 0xff) == 0xae) {
-        return new Opcode("freturn", value);
-    }
+        return new FixLengthOpcode("freturn", value, pos);
     if((value & 0xff) == 0x38) {
-        return new Opcode("fstore", value, new byte[]{values[pos + 1]});
-    }
+        return new FixLengthOpcode("fstore", value, new byte[]{values[pos + 1]},pos);
     if((value & 0xff) == 0x43) {
-        return new Opcode("fstore_0", value);
-    }
+        return new FixLengthOpcode("fstore_0", value, pos);
     if((value & 0xff) == 0x44) {
-        return new Opcode("fstore_1", value);
-    }
+        return new FixLengthOpcode("fstore_1", value, pos);
     if((value & 0xff) == 0x45) {
-        return new Opcode("fstore_2", value);
-    }
+        return new FixLengthOpcode("fstore_2", value, pos);
     if((value & 0xff) == 0x46) {
-        return new Opcode("fstore_3", value);
-    }
+        return new FixLengthOpcode("fstore_3", value, pos);
     if((value & 0xff) == 0x66) {
-        return new Opcode("fsub", value);
-    }
+        return new FixLengthOpcode("fsub", value, pos);
     if((value & 0xff) == 0xb4) {
-        return new Opcode("getfield", value, new byte[]{values[pos + 1], values[pos + 2]});
-    }
+        return new FixLengthOpcode("getfield", value, new byte[]{values[pos + 1], values[pos + 2]},pos);
     if((value & 0xff) == 0xb2) {
-        return new Opcode("getstatic", value, new byte[]{values[pos + 1], values[pos + 2]});
-    }
+        return new FixLengthOpcode("getstatic", value, new byte[]{values[pos + 1], values[pos + 2]},pos);
     if((value & 0xff) == 0xa7) {
-        return new Opcode("goto", value, new byte[]{values[pos + 1], values[pos + 2]});
-    }
+        return new FixLengthOpcode("goto", value, new byte[]{values[pos + 1], values[pos + 2]},pos);
     if((value & 0xff) == 0xc8) {
-        return new Opcode("goto_w", value, new byte[]{values[pos + 1], values[pos + 2], values[pos + 3], values[pos + 4]});
-    }
+        return new FixLengthOpcode("goto_w", value, new byte[]{values[pos + 1], values[pos + 2], values[pos + 3], values[pos + 4]},pos);
     if((value & 0xff) == 0x91) {
-        return new Opcode("i2b", value);
-    }
+        return new FixLengthOpcode("i2b", value, pos);
     if((value & 0xff) == 0x92) {
-        return new Opcode("i2c", value);
-    }
+        return new FixLengthOpcode("i2c", value, pos);
     if((value & 0xff) == 0x87) {
-        return new Opcode("i2d", value);
-    }
+        return new FixLengthOpcode("i2d", value, pos);
     if((value & 0xff) == 0x86) {
-        return new Opcode("i2f", value);
-    }
+        return new FixLengthOpcode("i2f", value, pos);
     if((value & 0xff) == 0x85) {
-        return new Opcode("i2l", value);
-    }
+        return new FixLengthOpcode("i2l", value, pos);
     if((value & 0xff) == 0x93) {
-        return new Opcode("i2s", value);
-    }
+        return new FixLengthOpcode("i2s", value, pos);
     if((value & 0xff) == 0x60) {
-        return new Opcode("iadd", value);
-    }
+        return new FixLengthOpcode("iadd", value, pos);
     if((value & 0xff) == 0x2e) {
-        return new Opcode("iaload", value);
-    }
+        return new FixLengthOpcode("iaload", value, pos);
     if((value & 0xff) == 0x7e) {
-        return new Opcode("iand", value);
-    }
+        return new FixLengthOpcode("iand", value, pos);
     if((value & 0xff) == 0x4f) {
-        return new Opcode("iastore", value);
-    }
+        return new FixLengthOpcode("iastore", value, pos);
     if((value & 0xff) == 0x2) {
-        return new Opcode("iconst_m1", value);
-    }
+        return new FixLengthOpcode("iconst_m1", value, pos);
     if((value & 0xff) == 0x3) {
-        return new Opcode("iconst_0", value);
-    }
+        return new FixLengthOpcode("iconst_0", value, pos);
     if((value & 0xff) == 0x4) {
-        return new Opcode("iconst_1", value);
-    }
+        return new FixLengthOpcode("iconst_1", value, pos);
     if((value & 0xff) == 0x5) {
-        return new Opcode("iconst_2", value);
-    }
+        return new FixLengthOpcode("iconst_2", value, pos);
     if((value & 0xff) == 0x6) {
-        return new Opcode("iconst_3", value);
-    }
+        return new FixLengthOpcode("iconst_3", value, pos);
     if((value & 0xff) == 0x7) {
-        return new Opcode("iconst_4", value);
-    }
+        return new FixLengthOpcode("iconst_4", value, pos);
     if((value & 0xff) == 0x8) {
-        return new Opcode("iconst_5", value);
-    }
+        return new FixLengthOpcode("iconst_5", value, pos);
     if((value & 0xff) == 0x6c) {
-        return new Opcode("idiv", value);
-    }
+        return new FixLengthOpcode("idiv", value, pos);
     if((value & 0xff) == 0xa5) {
-        return new Opcode("if_acmpeq", value, new byte[]{values[pos + 1], values[pos + 2]});
-    }
+        return new FixLengthOpcode("if_acmpeq", value, new byte[]{values[pos + 1], values[pos + 2]},pos);
     if((value & 0xff) == 0xa6) {
-        return new Opcode("if_acmpne", value, new byte[]{values[pos + 1], values[pos + 2]});
-    }
+        return new FixLengthOpcode("if_acmpne", value, new byte[]{values[pos + 1], values[pos + 2]},pos);
     if((value & 0xff) == 0x9f) {
-        return new Opcode("if_icmpeq", value, new byte[]{values[pos + 1], values[pos + 2]});
-    }
+        return new FixLengthOpcode("if_icmpeq", value, new byte[]{values[pos + 1], values[pos + 2]},pos);
     if((value & 0xff) == 0xa0) {
-        return new Opcode("if_icmpne", value, new byte[]{values[pos + 1], values[pos + 2]});
-    }
+        return new FixLengthOpcode("if_icmpne", value, new byte[]{values[pos + 1], values[pos + 2]},pos);
     if((value & 0xff) == 0xa1) {
-        return new Opcode("if_icmplt", value, new byte[]{values[pos + 1], values[pos + 2]});
-    }
+        return new FixLengthOpcode("if_icmplt", value, new byte[]{values[pos + 1], values[pos + 2]},pos);
     if((value & 0xff) == 0xa2) {
-        return new Opcode("if_icmpge", value, new byte[]{values[pos + 1], values[pos + 2]});
-    }
+        return new FixLengthOpcode("if_icmpge", value, new byte[]{values[pos + 1], values[pos + 2]},pos);
     if((value & 0xff) == 0xa3) {
-        return new Opcode("if_icmpgt", value, new byte[]{values[pos + 1], values[pos + 2]});
-    }
+        return new FixLengthOpcode("if_icmpgt", value, new byte[]{values[pos + 1], values[pos + 2]},pos);
     if((value & 0xff) == 0xa4) {
-        return new Opcode("if_icmple", value, new byte[]{values[pos + 1], values[pos + 2]});
-    }
+        return new FixLengthOpcode("if_icmple", value, new byte[]{values[pos + 1], values[pos + 2]},pos);
     if((value & 0xff) == 0x99) {
-        return new Opcode("ifeq", value, new byte[]{values[pos + 1], values[pos + 2]});
-    }
+        return new FixLengthOpcode("ifeq", value, new byte[]{values[pos + 1], values[pos + 2]},pos);
     if((value & 0xff) == 0x9a) {
-        return new Opcode("ifne", value, new byte[]{values[pos + 1], values[pos + 2]});
-    }
+        return new FixLengthOpcode("ifne", value, new byte[]{values[pos + 1], values[pos + 2]},pos);
     if((value & 0xff) == 0x9b) {
-        return new Opcode("iflt", value, new byte[]{values[pos + 1], values[pos + 2]});
-    }
+        return new FixLengthOpcode("iflt", value, new byte[]{values[pos + 1], values[pos + 2]},pos);
     if((value & 0xff) == 0x9c) {
-        return new Opcode("ifge", value, new byte[]{values[pos + 1], values[pos + 2]});
-    }
+        return new FixLengthOpcode("ifge", value, new byte[]{values[pos + 1], values[pos + 2]},pos);
     if((value & 0xff) == 0x9d) {
-        return new Opcode("ifgt", value, new byte[]{values[pos + 1], values[pos + 2]});
-    }
+        return new FixLengthOpcode("ifgt", value, new byte[]{values[pos + 1], values[pos + 2]},pos);
     if((value & 0xff) == 0x9e) {
-        return new Opcode("ifle", value, new byte[]{values[pos + 1], values[pos + 2]});
-    }
+        return new FixLengthOpcode("ifle", value, new byte[]{values[pos + 1], values[pos + 2]},pos);
     if((value & 0xff) == 0xc7) {
-        return new Opcode("ifnonull", value, new byte[]{values[pos + 1], values[pos + 2]});
-    }
+        return new FixLengthOpcode("ifnonull", value, new byte[]{values[pos + 1], values[pos + 2]},pos);
     if((value & 0xff) == 0xc6) {
-        return new Opcode("ifnull", value, new byte[]{values[pos + 1], values[pos + 2]});
-    }
+        return new FixLengthOpcode("ifnull", value, new byte[]{values[pos + 1], values[pos + 2]},pos);
     if((value & 0xff) == 0x84) {
-        return new Opcode("iinc", value, new byte[]{values[pos + 1], values[pos + 2]});
-    }
+        return new FixLengthOpcode("iinc", value, new byte[]{values[pos + 1], values[pos + 2]},pos);
     if((value & 0xff) == 0x15) {
-        return new Opcode("iload", value, new byte[]{values[pos + 1]});
-    }
+        return new FixLengthOpcode("iload", value, new byte[]{values[pos + 1]},pos);
     if((value & 0xff) == 0x1a) {
-        return new Opcode("iload_0", value);
-    }
+        return new FixLengthOpcode("iload_0", value, pos);
     if((value & 0xff) == 0x1b) {
-        return new Opcode("iload_1", value);
-    }
+        return new FixLengthOpcode("iload_1", value, pos);
     if((value & 0xff) == 0x1c) {
-        return new Opcode("iload_2", value);
-    }
+        return new FixLengthOpcode("iload_2", value, pos);
     if((value & 0xff) == 0x1d) {
-        return new Opcode("iload_3", value);
-    }
+        return new FixLengthOpcode("iload_3", value, pos);
     if((value & 0xff) == 0x68) {
-        return new Opcode("imul", value);
-    }
+        return new FixLengthOpcode("imul", value, pos);
     if((value & 0xff) == 0x74) {
-        return new Opcode("ineg", value);
-    }
+        return new FixLengthOpcode("ineg", value, pos);
     if((value & 0xff) == 0xc1) {
-        return new Opcode("instanceof", value, new byte[]{values[pos + 1], values[pos + 2]});
-    }
+        return new FixLengthOpcode("instanceof", value, new byte[]{values[pos + 1], values[pos + 2]},pos);
     if((value & 0xff) == 0xba) {
-        return new Opcode("invokedynamic", value, new byte[]{values[pos + 1], values[pos + 2], values[pos + 3], values[pos + 4]});
-    }
+        return new FixLengthOpcode("invokedynamic", value, new byte[]{values[pos + 1], values[pos + 2], values[pos + 3], values[pos + 4]},pos);
     if((value & 0xff) == 0xb9) {
-        return new Opcode("invokeinterface", value, new byte[]{values[pos + 1], values[pos + 2], values[pos + 3], values[pos + 4]});
-    }
+        return new FixLengthOpcode("invokeinterface", value, new byte[]{values[pos + 1], values[pos + 2], values[pos + 3], values[pos + 4]},pos);
     if((value & 0xff) == 0xb7) {
-        return new Opcode("invokespecial", value, new byte[]{values[pos + 1], values[pos + 2]});
-    }
+        return new FixLengthOpcode("invokespecial", value, new byte[]{values[pos + 1], values[pos + 2]},pos);
     if((value & 0xff) == 0xb8) {
-        return new Opcode("invokestatic", value, new byte[]{values[pos + 1], values[pos + 2]});
-    }
+        return new FixLengthOpcode("invokestatic", value, new byte[]{values[pos + 1], values[pos + 2]},pos);
     if((value & 0xff) == 0xb6) {
-        return new Opcode("invokevirtual", value, new byte[]{values[pos + 1], values[pos + 2]});
-    }
+        return new FixLengthOpcode("invokevirtual", value, new byte[]{values[pos + 1], values[pos + 2]},pos);
     if((value & 0xff) == 0x80) {
-        return new Opcode("ior", value);
-    }
+        return new FixLengthOpcode("ior", value, pos);
     if((value & 0xff) == 0x70) {
-        return new Opcode("irem", value);
-    }
+        return new FixLengthOpcode("irem", value, pos);
     if((value & 0xff) == 0xac) {
-        return new Opcode("ireturn", value);
-    }
+        return new FixLengthOpcode("ireturn", value, pos);
     if((value & 0xff) == 0x78) {
-        return new Opcode("ishl", value);
-    }
+        return new FixLengthOpcode("ishl", value, pos);
     if((value & 0xff) == 0x36) {
-        return new Opcode("istore", value, new byte[]{values[pos + 1]});
-    }
+        return new FixLengthOpcode("istore", value, new byte[]{values[pos + 1]},pos);
     if((value & 0xff) == 0x3b) {
-        return new Opcode("istore_0", value);
-    }
+        return new FixLengthOpcode("istore_0", value, pos);
     if((value & 0xff) == 0x3c) {
-        return new Opcode("istore_1", value);
-    }
+        return new FixLengthOpcode("istore_1", value, pos);
     if((value & 0xff) == 0x3d) {
-        return new Opcode("istore_2", value);
-    }
+        return new FixLengthOpcode("istore_2", value, pos);
     if((value & 0xff) == 0x3e) {
-        return new Opcode("istore_3", value);
-    }
+        return new FixLengthOpcode("istore_3", value, pos);
     if((value & 0xff) == 0x64) {
-        return new Opcode("isub", value);
-    }
+        return new FixLengthOpcode("isub", value, pos);
     if((value & 0xff) == 0x7c) {
-        return new Opcode("iushr", value);
-    }
+        return new FixLengthOpcode("iushr", value, pos);
     if((value & 0xff) == 0x82) {
-        return new Opcode("ixor", value);
-    }
+        return new FixLengthOpcode("ixor", value, pos);
     if((value & 0xff) == 0xa8) {
-        return new Opcode("jsr", value, new byte[]{values[pos + 1], values[pos + 2]});
-    }
+        return new FixLengthOpcode("jsr", value, new byte[]{values[pos + 1], values[pos + 2]},pos);
     if((value & 0xff) == 0xc9) {
-        return new Opcode("jsr_w", value, new byte[]{values[pos + 1], values[pos + 2], values[pos + 3], values[pos + 4]});
-    }
+        return new FixLengthOpcode("jsr_w", value, new byte[]{values[pos + 1], values[pos + 2], values[pos + 3], values[pos + 4]},pos);
     if((value & 0xff) == 0x8a) {
-        return new Opcode("i2d", value);
-    }
+        return new FixLengthOpcode("i2d", value, pos);
     if((value & 0xff) == 0x89) {
-        return new Opcode("l2f", value);
-    }
+        return new FixLengthOpcode("l2f", value, pos);
     if((value & 0xff) == 0x88) {
-        return new Opcode("l2i", value);
-    }
+        return new FixLengthOpcode("l2i", value, pos);
     if((value & 0xff) == 0x61) {
-        return new Opcode("ladd", value);
-    }
+        return new FixLengthOpcode("ladd", value, pos);
     if((value & 0xff) == 0x2f) {
-        return new Opcode("laload", value);
-    }
+        return new FixLengthOpcode("laload", value, pos);
     if((value & 0xff) == 0x7f) {
-        return new Opcode("land", value);
-    }
+        return new FixLengthOpcode("land", value, pos);
     if((value & 0xff) == 0x50) {
-        return new Opcode("lastore", value);
-    }
+        return new FixLengthOpcode("lastore", value, pos);
     if((value & 0xff) == 0x94) {
-        return new Opcode("lcmp", value);
-    }
+        return new FixLengthOpcode("lcmp", value, pos);
     if((value & 0xff) == 0x9) {
-        return new Opcode("lconst_0", value);
-    }
+        return new FixLengthOpcode("lconst_0", value, pos);
     if((value & 0xff) == 0xa) {
-        return new Opcode("lconst_1", value);
-    }
+        return new FixLengthOpcode("lconst_1", value, pos);
     if((value & 0xff) == 0x12) {
-        return new Opcode("ldc", value, new byte[]{values[pos + 1]});
-    }
+        return new FixLengthOpcode("ldc", value, new byte[]{values[pos + 1]},pos);
     if((value & 0xff) == 0x13) {
-        return new Opcode("ldc_w", value, new byte[]{values[pos + 1], values[pos + 2]});
-    }
+        return new FixLengthOpcode("ldc_w", value, new byte[]{values[pos + 1], values[pos + 2]},pos);
     if((value & 0xff) == 0x14) {
-        return new Opcode("ldc2_w", value, new byte[]{values[pos + 1], values[pos + 2]});
-    }
+        return new FixLengthOpcode("ldc2_w", value, new byte[]{values[pos + 1], values[pos + 2]},pos);
     if((value & 0xff) == 0x6d) {
-        return new Opcode("ldiv", value);
-    }
+        return new FixLengthOpcode("ldiv", value, pos);
     if((value & 0xff) == 0x16) {
-        return new Opcode("lload", value, new byte[]{values[pos + 1]});
-    }
+        return new FixLengthOpcode("lload", value, new byte[]{values[pos + 1]},pos);
     if((value & 0xff) == 0x1e) {
-        return new Opcode("lload_0", value);
-    }
+        return new FixLengthOpcode("lload_0", value, pos);
     if((value & 0xff) == 0x1f) {
-        return new Opcode("lload_1", value);
-    }
+        return new FixLengthOpcode("lload_1", value, pos);
     if((value & 0xff) == 0x20) {
-        return new Opcode("lload_2", value);
-    }
+        return new FixLengthOpcode("lload_2", value, pos);
     if((value & 0xff) == 0x21) {
-        return new Opcode("lload_3", value);
-    }
+        return new FixLengthOpcode("lload_3", value, pos);
     if((value & 0xff) == 0x69) {
-        return new Opcode("lmul", value);
-    }
+        return new FixLengthOpcode("lmul", value, pos);
     if((value & 0xff) == 0x75) {
-        return new Opcode("lneg", value);
-    }
+        return new FixLengthOpcode("lneg", value, pos);
     if((value & 0xff) == 0x81) {
-        return new Opcode("lor", value);
-    }
+        return new FixLengthOpcode("lor", value, pos);
     if((value & 0xff) == 0x71) {
-        return new Opcode("lrem", value);
-    }
+        return new FixLengthOpcode("lrem", value, pos);
     if((value & 0xff) == 0xad) {
-        return new Opcode("lreturn", value);
-    }
+        return new FixLengthOpcode("lreturn", value, pos);
     if((value & 0xff) == 0x79) {
-        return new Opcode("lshl", value);
-    }
+        return new FixLengthOpcode("lshl", value, pos);
     if((value & 0xff) == 0x7b) {
-        return new Opcode("lshr", value);
-    }
+        return new FixLengthOpcode("lshr", value, pos);
     if((value & 0xff) == 0x37) {
-        return new Opcode("lstore", value, new byte[]{values[pos + 1]});
-    }
+        return new FixLengthOpcode("lstore", value, new byte[]{values[pos + 1]},pos);
     if((value & 0xff) == 0x3f) {
-        return new Opcode("lstore_0", value);
-    }
+        return new FixLengthOpcode("lstore_0", value, pos);
     if((value & 0xff) == 0x40) {
-        return new Opcode("lstore_1", value);
-    }
+        return new FixLengthOpcode("lstore_1", value, pos);
     if((value & 0xff) == 0x41) {
-        return new Opcode("lstore_2", value);
-    }
+        return new FixLengthOpcode("lstore_2", value, pos);
     if((value & 0xff) == 0x42) {
-        return new Opcode("lstore_3", value);
-    }
+        return new FixLengthOpcode("lstore_3", value, pos);
     if((value & 0xff) == 0x65) {
-        return new Opcode("lsub", value);
-    }
+        return new FixLengthOpcode("lsub", value, pos);
     if((value & 0xff) == 0x7d) {
-        return new Opcode("lushr", value);
-    }
+        return new FixLengthOpcode("lushr", value, pos);
     if((value & 0xff) == 0x83) {
-        return new Opcode("lxor", value);
-    }
+        return new FixLengthOpcode("lxor", value, pos);
     if((value & 0xff) == 0xc2) {
-        return new Opcode("monitorenter", value);
-    }
+        return new FixLengthOpcode("monitorenter", value, pos);
     if((value & 0xff) == 0xc3) {
-        return new Opcode("monitorexit", value);
-    }
+        return new FixLengthOpcode("monitorexit", value, pos);
     if((value & 0xff) == 0xc5) {
-        return new Opcode("multianewarray", value, new byte[]{values[pos + 1], values[pos + 2], values[pos + 3]});
-    }
+        return new FixLengthOpcode("multianewarray", value, new byte[]{values[pos + 1], values[pos + 2], values[pos + 3]},pos);
     if((value & 0xff) == 0xbb) {
-        return new Opcode("new", value, new byte[]{values[pos + 1], values[pos + 2]});
-    }
+        return new FixLengthOpcode("new", value, new byte[]{values[pos + 1], values[pos + 2]},pos);
     if((value & 0xff) == 0xbc) {
-        return new Opcode("newarray", value, new byte[]{values[pos + 1]});
-    }
+        return new FixLengthOpcode("newarray", value, new byte[]{values[pos + 1]},pos);
     if((value & 0xff) == 0x0) {
-        return new Opcode("nop", value);
-    }
+        return new FixLengthOpcode("nop", value, pos);
     if((value & 0xff) == 0x57) {
-        return new Opcode("pop", value);
-    }
+        return new FixLengthOpcode("pop", value, pos);
     if((value & 0xff) == 0x58) {
-        return new Opcode("pop2", value);
-    }
+        return new FixLengthOpcode("pop2", value, pos);
     if((value & 0xff) == 0xb5) {
-        return new Opcode("putfield", value, new byte[]{values[pos + 1], values[pos + 2]});
-    }
+        return new FixLengthOpcode("putfield", value, new byte[]{values[pos + 1], values[pos + 2]},pos);
     if((value & 0xff) == 0xb3) {
-        return new Opcode("putstatic", value, new byte[]{values[pos + 1], values[pos + 2]});
-    }
+        return new FixLengthOpcode("putstatic", value, new byte[]{values[pos + 1], values[pos + 2]},pos);
     if((value & 0xff) == 0xa9) {
-        return new Opcode("ret", value, new byte[]{values[pos + 1]});
-    }
+        return new FixLengthOpcode("ret", value, new byte[]{values[pos + 1]},pos);
     if((value & 0xff) == 0xb1) {
-        return new Opcode("return", value);
-    }
+        return new FixLengthOpcode("return", value, pos);
     if((value & 0xff) == 0x35) {
-        return new Opcode("saload", value);
-    }
+        return new FixLengthOpcode("saload", value, pos);
     if((value & 0xff) == 0x56) {
-        return new Opcode("satore", value);
-    }
+        return new FixLengthOpcode("satore", value, pos);
     if((value & 0xff) == 0x11) {
-        return new Opcode("sipush", value, new byte[]{values[pos + 1], values[pos + 2]});
-    }
+        return new FixLengthOpcode("sipush", value, new byte[]{values[pos + 1], values[pos + 2]},pos);
     if((value & 0xff) == 0x5f) {
-        return new Opcode("swap", value);
-    }
+        return new FixLengthOpcode("swap", value, pos);
     throw new ClassFormatError("Unknown Opcode: " + Integer.toHexString(value & 0xff));
 }

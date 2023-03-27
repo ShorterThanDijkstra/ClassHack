@@ -23,18 +23,17 @@ public class CodeGen {
     }
 
     /*
-      generate codes for com.github.std.classhack.engine.classloader.attribute.Code.Opcode.parse(byte[] values, int pos)
+      generate codes for method: parseFixedLengthOpcode(byte[] values, byte value, int pos)
+      in com.github.std.classhack.engine.classloader.attribute.Code.Opcode,
       which parses bytecode array.
-      exception: lookupswitch, tableswitch, wide
+       lookupswitch, tableswitch, wide are special
      */
     public void genOpcodeParser() {
         final String OPCODES_DEFINE_FILE = "src/main/java/com/github/std/classhack/dev/opcodes.txt";
         final String METHOD_CODE_FILE = "src/main/java/com/github/std/classhack/dev/opcode_parse.txt";
         try (LineNumberReader reader = new LineNumberReader(new FileReader(OPCODES_DEFINE_FILE));
              FileWriter writer = new FileWriter(METHOD_CODE_FILE)) {
-            writer.write("public static Opcode parse(byte[] values, int pos) {\n");
-            writer.write("    byte value = values[pos];\n");
-
+            writer.write("{\n");
             String line = reader.readLine();
             StringBuilder operandsBuilder = new StringBuilder();
             while (line != null) {
@@ -49,7 +48,7 @@ public class CodeGen {
 
                 writer.write("    if((value & 0xff) == " + value + ") {\n");
                 if (after == 0) {
-                    writer.write("        return new FixLengthOpcode(\"" + mnemonic + "\", value);\n");
+                    writer.write("        return new FixLengthOpcode(\"" + mnemonic + "\", value, pos);\n");
                 } else {
                     operandsBuilder.append("new byte[]{");
                     for (int i = 1; i <= after; i++) {
@@ -59,11 +58,9 @@ public class CodeGen {
                         }
                     }
                     operandsBuilder.append("}");
-                    writer.write("        return new FixLengthOpcode(\"" + mnemonic + "\", value, " + operandsBuilder + ");\n");
+                    writer.write("        return new FixLengthOpcode(\"" + mnemonic + "\", value, " + operandsBuilder + ",pos);\n");
                     operandsBuilder.setLength(0);
                 }
-
-                writer.write("    }\n");
 
                 line = reader.readLine();
             }
