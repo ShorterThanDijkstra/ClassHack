@@ -48,6 +48,18 @@ public final class Code implements AttributeInfo {
 
         byte[] operands();
 
+        String show();
+
+        static void printOpcodes(Code code) {
+            List<Code.Opcode> opcodes = code.getOpcodes();
+            int line = 0;
+            for (Code.Opcode opcode : opcodes) {
+                System.out.print(line + ": ");
+                System.out.println(opcode.show());
+                line += opcode.operands().length + 1;
+            }
+        }
+
         static Opcode parse(final byte[] values, final int pos) {
             byte value = values[pos];
             // special cases: lookupswitch, tableswitch, wide
@@ -746,6 +758,16 @@ public final class Code implements AttributeInfo {
             return operands;
         }
 
+        @Override
+        public String show() {
+            StringBuilder builder = new StringBuilder("lookupswitch {\n");
+            for (int i = 0; i < matchOffsetPairs.length / 2; i++) {
+                builder.append('\t').append(matchOffsetPairs[i * 2]).append(": ").append(matchOffsetPairs[i * 2 + 1] + 1).append('\n');
+            }
+            builder.append("\tdefault").append(": ").append(defaultJump + 1).append("\n}");
+            return builder.toString();
+        }
+
         public int getDefaultJump() {
             return defaultJump;
         }
@@ -787,6 +809,18 @@ public final class Code implements AttributeInfo {
         @Override
         public byte[] operands() {
             return operands;
+        }
+
+        @Override
+        public String show() {
+            StringBuilder builder = new StringBuilder("tableswitch {\n");
+            int entry = low;
+            for (int offset : offsets) {
+                builder.append('\t').append(entry).append(": ").append(offset + 1).append('\n');
+                entry++;
+            }
+            builder.append("\tdefault").append(": ").append(defaultJump + 1).append("\n}");
+            return builder.toString();
         }
 
         public int getDefaultJump() {
@@ -837,6 +871,200 @@ public final class Code implements AttributeInfo {
         public byte[] operands() {
             return operands;
         }
+
+        private String showWide() {
+            byte modified = operands[0];
+
+            if ((modified & 0xff) == 0x84) {
+                int index = (operands[1] & 0xff) << 8 | (operands[2] & 0xff);
+                int cst = (operands[3] & 0xff) << 8 | (operands[4] & 0xff);
+                return "wide iinc " + index + " " + cst;
+            }
+
+            String opcode;
+            if ((modified & 0xff) == 0x15) {
+                opcode = "iload";
+            } else if ((modified & 0xff) == 0x17) {
+                opcode = "fload";
+            } else if ((modified & 0xff) == 0x19) {
+                opcode = "aload";
+            } else if ((modified & 0xff) == 0x16) {
+                opcode = "lload";
+            } else if ((modified & 0xff) == 0x18) {
+                opcode = "dload";
+            } else if ((modified & 0xff) == 0x36) {
+                opcode = "istore";
+            } else if ((modified & 0xff) == 0x38) {
+                opcode = "fstore";
+            } else if ((modified & 0xff) == 0x3a) {
+                opcode = "astore";
+            } else if ((modified & 0xff) == 0x37) {
+                opcode = "lstore";
+            } else if ((modified & 0xff) == 0x39) {
+                opcode = "dstore";
+            } else if ((modified & 0xff) == 0xa9) {
+                opcode = "ret";
+            } else {
+                throw new ClassFormatError();
+            }
+            int index = (operands[1] & 0xff) << 8 | (operands[2] & 0xff);
+            return "wide " + opcode + " " + index;
+        }
+
+        @Override
+        public String show() {
+            if ((value & 0xff) == 0xc4) {
+                return showWide();
+            }
+            if (operands.length != 0) {
+                return showWithOperands();
+            }
+            return mnemonic;
+        }
+
+        private String unsignedOneByte() {
+            assert operands.length == 1;
+            return Integer.toString(operands[0] & 0xff);
+        }
+
+        private String signedOneByte() {
+            assert operands.length == 1;
+            return Byte.toString(operands[0]);
+        }
+
+        private String unsignedTwoBytes() {
+            assert operands.length == 2;
+            int index = (operands[0] & 0xff) << 8 | (operands[1] & 0xff);
+            return Integer.toString(index);
+        }
+
+        private String signedTwoBytes() {
+            assert operands.length == 2;
+            short index = (short) ((operands[0] & 0xff) << 8 | (operands[1] & 0xff));
+            return Short.toString(index);
+        }
+
+        private String signedFourBytes() {
+            assert operands.length == 4;
+            int index = byteArrayToInt(operands, 0, 4);
+            return Integer.toString(index);
+        }
+
+        private String showWithOperands() {
+            String append;
+            if ((value & 0xff) == 0x19) {
+                append = unsignedOneByte();
+            } else if ((value & 0xff) == 0xbd) {
+                append = unsignedTwoBytes();
+            } else if ((value & 0xff) == 0x3a) {
+                append = unsignedOneByte();
+            } else if ((value & 0xff) == 0x10) {
+                append = signedOneByte();
+            } else if ((value & 0xff) == 0xc0) {
+                append = unsignedTwoBytes();
+            } else if ((value & 0xff) == 0x18) {
+                append = unsignedOneByte();
+            } else if ((value & 0xff) == 0x39) {
+                append = unsignedOneByte();
+            } else if ((value & 0xff) == 0x17) {
+                append = unsignedOneByte();
+            } else if ((value & 0xff) == 0x38) {
+                append = unsignedOneByte();
+            } else if ((value & 0xff) == 0xb4) {
+                append = unsignedTwoBytes();
+            } else if ((value & 0xff) == 0xb2) {
+                append = unsignedTwoBytes();
+            } else if ((value & 0xff) == 0xa7) {
+                append = unsignedTwoBytes();
+            } else if ((value & 0xff) == 0xc8) {
+                append = signedFourBytes();
+            } else if ((value & 0xff) == 0xa5 || (value & 0xff) == 0xa6 || (value & 0xff) == 0x9f || (value & 0xff) == 0xa0 || (value & 0xff) == 0xa1 || (value & 0xff) == 0xa2 || (value & 0xff) == 0xa3 || (value & 0xff) == 0xa4 || (value & 0xff) == 0x99 || (value & 0xff) == 0x9a || (value & 0xff) == 0x9c || (value & 0xff) == 0x9d || (value & 0xff) == 0x9e || (value & 0xff) == 0xc7 || (value & 0xff) == 0xc6) {
+                append = unsignedTwoBytes();
+            } else if ((value & 0xff) == 0x84) {
+                assert operands.length == 2;
+                String index = Integer.toString(operands[0] & 0xff);
+                String cst = Byte.toString(operands[1]);
+                append = index + " " + cst;
+            } else if ((value & 0xff) == 0x15) {
+                append = unsignedOneByte();
+            } else if ((value & 0xff) == 0xc1) {
+                append = unsignedTwoBytes();
+            } else if ((value & 0xff) == 0xba) {
+                assert operands.length == 4;
+                int index = (operands[0] & 0xff) << 8 | (operands[1] & 0xff);
+                append = Integer.toString(index);
+            } else if ((value & 0xff) == 0xb9) {
+                assert operands.length == 4;
+                int index = (operands[0] & 0xff) << 8 | (operands[1] & 0xff);
+                int cnt = operands[2] & 0xff;
+                append = index + " " + cnt;
+            } else if ((value & 0xff) == 0xb7) {
+                append = unsignedTwoBytes();
+            } else if ((value & 0xff) == 0xb8) {
+                append = unsignedTwoBytes();
+            } else if ((value & 0xff) == 0xb6) {
+                append = unsignedTwoBytes();
+            } else if ((value & 0xff) == 0x36) {
+                append = unsignedOneByte();
+            } else if ((value & 0xff) == 0xa8) {
+                append = unsignedTwoBytes();
+            } else if ((value & 0xff) == 0xc9) {
+                append = signedFourBytes();
+            } else if ((value & 0xff) == 0x12) {
+                append = unsignedOneByte();
+            } else if ((value & 0xff) == 0x13) {
+                append = unsignedTwoBytes();
+            } else if ((value & 0xff) == 0x14) {
+                append = unsignedTwoBytes();
+            } else if ((value & 0xff) == 0x16) {
+                append = unsignedOneByte();
+            } else if ((value & 0xff) == 0x37) {
+                append = unsignedOneByte();
+            } else if ((value & 0xff) == 0xc5) {
+                assert operands.length == 3;
+                int index = (operands[0] & 0xff) << 8 | (operands[1] & 0xff);
+                int dimensions = operands[2] & 0xff;
+                append = index + " " + dimensions;
+            } else if ((value & 0xff) == 0xbb) {
+                append = unsignedTwoBytes();
+            } else if ((value & 0xff) == 0xbc) {
+                assert operands.length == 1;
+                int atype = operands[0];
+                if (atype == 4) {
+                    append = "Boolean";
+                } else if (atype == 5) {
+                    append = "Char";
+                } else if (atype == 6) {
+                    append = "Float";
+                } else if (atype == 7) {
+                    append = "Double";
+                } else if (atype == 8) {
+                    append = "Byte";
+                } else if (atype == 9) {
+                    append = "Short";
+                } else if (atype == 10) {
+                    append = "Int";
+                } else if (atype == 11) {
+                    append = "Long";
+                } else {
+                    throw new ClassFormatError();
+                }
+            } else if ((value & 0xff) == 0xb5) {
+                append = unsignedTwoBytes();
+
+            } else if ((value & 0xff) == 0xb3) {
+                append = unsignedTwoBytes();
+            } else if ((value & 0xff) == 0xa9) {
+                append = unsignedOneByte();
+            } else if ((value & 0xff) == 0x11) {
+                append = signedTwoBytes();
+            } else {
+                throw new ClassFormatError();
+            }
+            return mnemonic + " " + append;
+        }
+
+
     }
 
     private static class ExceptionInfo {

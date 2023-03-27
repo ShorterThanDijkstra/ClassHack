@@ -40,7 +40,7 @@ public final class Class0 implements Closeable {
         close();
     }
 
-    private void parseClassFile() throws IOException {
+    public void parseClassFile() throws IOException {
         parseMagicNum();
         parseMinorVersion();
         parseMajorVersion();
@@ -54,7 +54,7 @@ public final class Class0 implements Closeable {
         parseAttributes();
     }
 
-    private void parseMagicNum() throws IOException {
+    public void parseMagicNum() throws IOException {
         byte[] magicNum = new byte[4];
         int read = input.read(magicNum);
         assert read == 4;
@@ -62,21 +62,21 @@ public final class Class0 implements Closeable {
     }
 
 
-    private void parseMinorVersion() throws IOException {
+    public void parseMinorVersion() throws IOException {
         builder.minorVersion = readBytes2(input);
     }
 
-    private void parseMajorVersion() throws IOException {
+    public void parseMajorVersion() throws IOException {
         builder.majorVersion = readBytes2(input);
     }
 
 
-    private void parseConstantPool() throws IOException {
+    public void parseConstantPool() throws IOException {
         int constantPoolCount = readBytes2(input);
         builder.constantPool = ConstantPool.parse(constantPoolCount - 1, input);
     }
 
-    private void parseAccessFlags() throws IOException {
+    public void parseAccessFlags() throws IOException {
         byte[] bsAccessFlags = new byte[2];
         int read = input.read(bsAccessFlags);
         assert read == 2;
@@ -110,19 +110,19 @@ public final class Class0 implements Closeable {
         builder.accessFlags = accessFlags;
     }
 
-    private void parseThisClass() throws IOException {
+    public void parseThisClass() throws IOException {
         int thisClassIndex = readBytes2(input);
         ConstantPool constantPool = builder.constantPool;
         builder.thisClass = checker.checkThisClass(constantPool, thisClassIndex);
     }
 
-    private void parseSuperClass() throws IOException {
+    public void parseSuperClass() throws IOException {
         int superClassIndex = readBytes2(input);
         builder.superClass = checker.checkSuperClass(builder.constantPool, superClassIndex, builder.isInterface());
 
     }
 
-    private void parseInterfaces() throws IOException {
+    public void parseInterfaces() throws IOException {
         int interfacesNum = readBytes2(input);
         int[] constClassIndices = new int[interfacesNum];
         for (int i = 0; i < interfacesNum; i++) {
@@ -131,18 +131,18 @@ public final class Class0 implements Closeable {
         builder.interfaces = checker.checkInterfaces(builder.constantPool, constClassIndices);
     }
 
-    private void parseFields() throws IOException {
+    public void parseFields() throws IOException {
         int fieldsCount = readBytes2(input);
         builder.fieldTable = FieldTable.parse(fieldsCount, input, builder);
     }
 
-    private void parseMethods() throws IOException {
+    public void parseMethods() throws IOException {
         int methodCount = readBytes2(input);
 
         builder.methodTable = MethodTable.parse(methodCount, input, builder);
     }
 
-    private void parseAttributes() throws IOException {
+    public void parseAttributes() throws IOException {
         int attrCount = readBytes2(input);
 
         builder.attributeTable = AttributeTable.parse(attrCount, input, builder);

@@ -11,6 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 
+import static com.github.std.classhack.classreader.attribute.Code.Opcode.printOpcodes;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class Class1Test {
@@ -23,20 +24,6 @@ public class Class1Test {
         classFile = classReader.getClassFile();
     }
 
-    private void showOpcodes(Code code) {
-        List<Code.Opcode> opcodes = code.getOpcodes();
-        for (Code.Opcode opcode : opcodes) {
-            String mnemonic = opcode.mnemonic();
-            byte[] operands = opcode.operands();
-            System.out.print(mnemonic);
-            System.out.print("\t");
-            for (byte b : operands) {
-                System.out.print(Integer.toHexString(Byte.toUnsignedInt(b)));
-                System.out.print(" ");
-            }
-            System.out.println();
-        }
-    }
 
     @Test
     void opcodeTest0() {
@@ -44,11 +31,13 @@ public class Class1Test {
 
         String name = methodInfo.getName();
         assertEquals("test0", name);
+        System.out.println(methodInfo.getAccessFlags() + " " + methodInfo.getDescriptor() + " " + name);
 
         List<AttributeInfo> attributes = methodInfo.getAttributeTable().getAttributes();
         Code code = (Code) attributes.get(0);
+        System.out.println("locals: " + code.getMaxLocals() + "    stack: " + code.getMaxStack());
 
-        showOpcodes(code);
+        printOpcodes(code);
     }
 
     @Test
@@ -56,11 +45,13 @@ public class Class1Test {
         MethodInfo methodInfo = classFile.getMethodTable().getMethodInfos().get(2);
         String name = methodInfo.getName();
         assertEquals("test1", name);
+        System.out.println(methodInfo.getAccessFlags() + " " + methodInfo.getDescriptor() + " " + name);
 
         List<AttributeInfo> attributes = methodInfo.getAttributeTable().getAttributes();
         Code code = (Code) attributes.get(0);
+        System.out.println("locals: " + code.getMaxLocals() + "    stack: " + code.getMaxStack());
+        printOpcodes(code);
 
-        showOpcodes(code);
 
     }
 }
