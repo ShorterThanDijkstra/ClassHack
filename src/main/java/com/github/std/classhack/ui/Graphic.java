@@ -2,64 +2,150 @@ package com.github.std.classhack.ui;
 
 import com.formdev.flatlaf.FlatLightLaf;
 import com.github.std.classhack.classreader.ClassFile;
+import com.github.std.classhack.classreader.ClassReader;
 
 import javax.swing.*;
+import javax.swing.border.EtchedBorder;
+import javax.swing.border.TitledBorder;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Style;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
 import java.awt.*;
+import java.io.File;
+import java.io.FileInputStream;
 
 public class Graphic implements UI {
     private static class MainFrame extends JFrame {
-        private final JTextArea infoDisplay = new JTextArea();
-        private final JTextArea basicDisplay = new JTextArea();
+        private final JTextPane basicDisplay = new JTextPane();
+        private final JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT);
+        private ClassFileShow classShow;
 
-        private ClassFile classFile;
+        private void openFile() {
+            JFileChooser fileChooser = new JFileChooser();
+            fileChooser.setMultiSelectionEnabled(false);
 
-        private void openFile(String file) {
-            System.out.println("openFile");
+            int res = fileChooser.showOpenDialog(this);
+//            FileFilter fileFilter = new FileFilter() {
+//                @Override
+//                public boolean accept(File f) {
+//                    return !f.isDirectory() && f.getName().endsWith(".class");
+//                }
+//
+//                @Override
+//                public String getDescription() {
+//                    return "class file";
+//                }
+//            };
+//            fileChooser.addChoosableFileFilter(fileFilter);
+//            fileChooser.setFileFilter(fileFilter);
+            if (res != JFileChooser.APPROVE_OPTION) {
+                System.exit(0);
+            }
+            try {
+                File file = fileChooser.getSelectedFile();
+                ClassReader classReader = new ClassReader(new FileInputStream(file));
+                ClassFile classFile = classReader.getClassFile();
+                classShow = new ClassFileShow(classFile);
+                showBasic();
+            } catch (Throwable e) {
+                JOptionPane.showMessageDialog(this, e.toString());
+            }
+
+
         }
 
-        private void menuBar(String file) {
+        private void insertText(JTextPane display, String str) {
+            // 设置文本样式
+            StyledDocument doc = display.getStyledDocument();
+            Style style = doc.addStyle("Black", null);
+            StyleConstants.setForeground(style, Color.BLACK);
+
+            // 添加文本到文本区域
+            try {
+                display.setText("");
+                doc.insertString(0, str, style);
+            } catch (BadLocationException e) {
+                e.printStackTrace();
+            }
+
+        }
+
+        private void showBasic() {
+            insertText(basicDisplay, classShow.showBasic());
+        }
+
+        private void showFieldsMethods() {
+            JTextPane display = new JTextPane();
+            insertText(display, classShow.showFieldsMethods());
+            splitPane.setRightComponent(scrollText(display, "Fields&Methods"));
+        }
+
+        private void showConstantPool() {
+            JTextPane display = new JTextPane();
+            insertText(display, classShow.showConstantPool());
+            splitPane.setRightComponent(scrollText(display, "Constant Pool"));
+
+        }
+
+        private void menuBar() {
             JMenuBar menuBar = new JMenuBar();
 
-            JButton open = new JButton("Open");
-            open.addActionListener(e -> openFile(file));
-            open.setBorder(BorderFactory.createEmptyBorder(0, 1, 0, 10));
-            menuBar.add(open);
+            JMenu fileMenu = new JMenu("File");
+            menuBar.add(fileMenu);
+            JMenuItem open = new JMenuItem("Open Class");
+            open.addActionListener(e -> openFile());
+            fileMenu.add(open);
 
-            JButton constant = new JButton("ConstantPool");
-            constant.setBorder(BorderFactory.createEmptyBorder(0, 1, 0, 10));
+            JMenu classMenu = new JMenu("Class");
+            menuBar.add(classMenu);
 
-            constant.addActionListener(e -> showConstantPool());
-            menuBar.add(constant);
+            JMenuItem constantPool = new JMenuItem("ConstantPool");
+            classMenu.add(constantPool);
+            constantPool.addActionListener(e -> showConstantPool());
 
-            JButton fieldsMethods = new JButton("Fields&Methods");
-            fieldsMethods.setBorder(BorderFactory.createEmptyBorder(0, 1, 0, 10));
+            JMenuItem fieldsMethods = new JMenuItem("Fields&Methods");
+            classMenu.add(fieldsMethods);
             fieldsMethods.addActionListener(e -> showFieldsMethods());
-            menuBar.add(fieldsMethods);
-
 
             setJMenuBar(menuBar);
         }
 
-        private void showFieldsMethods() {
-            System.out.println("showFieldsMethods");
-        }
 
-        private void showConstantPool() {
-            System.out.println("showConstantPool");
-        }
-
-        public MainFrame(String file) {
+        public MainFrame() {
             FlatLightLaf.setup();
+
+            setVisible(true);
             setTitle("Class Hacker");
             setLocationRelativeTo(null);
             setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
+            menuBar();
 
-            menuBar(file);
+            JPanel mainPanel = new JPanel(new BorderLayout());
+            splitPane.setDividerLocation(this.getWidth() / 3);
+            Font font = new Font("宋体", Font.PLAIN, 16);
 
-            JPanel mainPanel = new JPanel(new GridLayout(1, 3));
-            mainPanel.setBorder(BorderFactory.createEmptyBorder(1, 5, 1, 5));
+            basicDisplay.setFont(font);
+
+            basicDisplay.setEditable(false);
+            splitPane.setLeftComponent(scrollText(basicDisplay, "Basic"));
+            mainPanel.add(splitPane);
             add(mainPanel);
+
+            openFile();
+
+        }
+
+        private JPanel scrollText(JTextPane display, String title) {
+            JScrollPane scroll = new JScrollPane(display);
+            scroll.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+
+            JPanel panel = new JPanel();
+            panel.setLayout(new BorderLayout());
+            panel.setBorder(new TitledBorder(new EtchedBorder(), title));
+            panel.add(scroll);
+            return panel;
         }
 
 
@@ -67,10 +153,7 @@ public class Graphic implements UI {
 
 
     @Override
-    public void show(String file) {
-        SwingUtilities.invokeLater(() -> {
-            MainFrame frame = new MainFrame("test");
-            frame.setVisible(true);
-        });
+    public void show() {
+        SwingUtilities.invokeLater(MainFrame::new);
     }
 }
