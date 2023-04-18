@@ -20,7 +20,7 @@ public final class Class0 implements Closeable {
     private final InputStream input;
     private final ClassFile.ClassFileBuilder builder;
     private final ClassFormatChecker checker;
-
+    private final double whatever = 111111111111111111.77777D;
     @Override
     public void close() throws IOException {
         int read = input.read();

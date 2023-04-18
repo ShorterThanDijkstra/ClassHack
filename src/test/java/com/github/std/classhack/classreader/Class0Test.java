@@ -32,7 +32,7 @@ class Class0Test {
         int minorVersion = classFile.getMinorVersion();
         int majorVersion = classFile.getMajorVersion();
         assertEquals(0, minorVersion);
-        assertEquals(52, majorVersion);
+        assertEquals(63, majorVersion);
     }
 
     @Test
