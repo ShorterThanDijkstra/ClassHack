@@ -13,7 +13,7 @@ import java.util.List;
 public record ClassFileShow(ClassFile classFile, String path) {
     public String showBasic() {
         StringBuilder builder = new StringBuilder();
-        builder.append("path: ").append(path).append("\n\n");
+//        builder.append("path: ").append(path).append("\n\n");
         builder.append("major version: ").append(classFile.getMajorVersion()).append("\n\n");
         builder.append("minor version: ").append(classFile.getMinorVersion()).append("\n\n");
         builder.append("class name: ").append(classFile.getThisClass()).append("\n\n");
