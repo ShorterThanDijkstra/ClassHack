@@ -46,7 +46,7 @@ public class Graphic implements UI {
                 File file = fileChooser.getSelectedFile();
                 ClassReader classReader = new ClassReader(new FileInputStream(file));
                 ClassFile classFile = classReader.getClassFile();
-                classShow = new ClassFileShow(classFile);
+                classShow = new ClassFileShow(classFile, file.getPath());
                 showBasic();
             } catch (Throwable e) {
                 JOptionPane.showMessageDialog(this, e.toString());

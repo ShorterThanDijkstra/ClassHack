@@ -219,6 +219,7 @@ public class ConstantPool {
     }
 
     public Constant get(int index) {
+        // 注意标准里index从1开始
         return pool.get(index);
     }
 

@@ -1094,7 +1094,7 @@ public final class Code implements AttributeInfo {
 
     }
 
-    private static class ExceptionInfo {
+    public static class ExceptionInfo {
         private final int startPc;
         private final int endPc;
         private final int handlerPc;
