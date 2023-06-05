@@ -4,7 +4,7 @@ A JVM(Java 8) class file parser
 
 # Usage
 
-java -jar --enable-preview ClassHack-[version].jar
+java -jar --enable-preview ClassHack-(version).jar
 
 JRE version: 17+
 

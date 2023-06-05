@@ -14,6 +14,7 @@ import javax.swing.text.StyledDocument;
 import java.awt.*;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 
 public class Graphic implements UI {
     private static class MainFrame extends JFrame {
@@ -44,15 +45,17 @@ public class Graphic implements UI {
             }
             try {
                 File file = fileChooser.getSelectedFile();
-                ClassReader classReader = new ClassReader(new FileInputStream(file));
-                ClassFile classFile = classReader.getClassFile();
-                classShow = new ClassFileShow(classFile, file.getPath());
+                initClassFileShow(file);
                 showBasic();
             } catch (Throwable e) {
                 JOptionPane.showMessageDialog(this, e.toString());
             }
+        }
 
-
+        private void initClassFileShow(File file) throws IOException {
+            ClassReader classReader = new ClassReader(new FileInputStream(file));
+            ClassFile classFile = classReader.getClassFile();
+            classShow = new ClassFileShow(classFile, file.getPath());
         }
 
         private void insertText(JTextPane display, String str) {
@@ -93,14 +96,14 @@ public class Graphic implements UI {
 
             JMenu fileMenu = new JMenu("File");
             menuBar.add(fileMenu);
-            JMenuItem open = new JMenuItem("Open Class");
+            JMenuItem open = new JMenuItem("Open Class File");
             open.addActionListener(e -> openFile());
             fileMenu.add(open);
 
             JMenu classMenu = new JMenu("Class");
             menuBar.add(classMenu);
 
-            JMenuItem constantPool = new JMenuItem("ConstantPool");
+            JMenuItem constantPool = new JMenuItem("Constant Pool");
             classMenu.add(constantPool);
             constantPool.addActionListener(e -> showConstantPool());
 
@@ -112,7 +115,18 @@ public class Graphic implements UI {
         }
 
 
-        public MainFrame() {
+        public MainFrame(String filename) {
+            init();
+            File file = new File(filename);
+            try {
+                initClassFileShow(file);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            showBasic();
+        }
+
+        private void init() {
             FlatLightLaf.setup();
 
             setVisible(true);
@@ -132,7 +146,10 @@ public class Graphic implements UI {
             splitPane.setLeftComponent(scrollText(basicDisplay, "Basic"));
             mainPanel.add(splitPane);
             add(mainPanel);
+        }
 
+        public MainFrame() {
+            init();
             openFile();
 
         }
@@ -156,4 +173,11 @@ public class Graphic implements UI {
     public void show() {
         SwingUtilities.invokeLater(MainFrame::new);
     }
+
+    @Override
+    public void show(String filename) {
+        SwingUtilities.invokeLater(() -> new MainFrame(filename));
+    }
+
+
 }

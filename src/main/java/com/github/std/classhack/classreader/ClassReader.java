@@ -46,7 +46,7 @@ public final class ClassReader implements Closeable {
     }
 
     private ClassParser initParseChain() {
-        ClassParser attrParser = new ClassParser(null, () -> {
+        ClassParser attrParser = new ClassParser("AttributesParser",null, () -> {
             try {
                 this.parseAttributes();
             } catch (IOException e) {
@@ -54,7 +54,7 @@ public final class ClassReader implements Closeable {
             }
         });
 
-        ClassParser methodParser = new ClassParser(attrParser, () -> {
+        ClassParser methodParser = new ClassParser("MethodsParser",attrParser, () -> {
             try {
                 this.parseMethods();
             } catch (IOException e) {
@@ -62,7 +62,7 @@ public final class ClassReader implements Closeable {
             }
         });
 
-        ClassParser fieldParser = new ClassParser(methodParser, () -> {
+        ClassParser fieldParser = new ClassParser("FieldsParser",methodParser, () -> {
             try {
                 this.parseFields();
             } catch (IOException e) {
@@ -70,7 +70,7 @@ public final class ClassReader implements Closeable {
             }
         });
 
-        ClassParser interfaceParser = new ClassParser(fieldParser, () -> {
+        ClassParser interfaceParser = new ClassParser("InterfacesParser",fieldParser, () -> {
             try {
                 this.parseInterfaces();
             } catch (IOException e) {
@@ -78,7 +78,7 @@ public final class ClassReader implements Closeable {
             }
         });
 
-        ClassParser superParser = new ClassParser(interfaceParser, () -> {
+        ClassParser superParser = new ClassParser("SuperClassParser",interfaceParser, () -> {
             try {
                 this.parseSuperClass();
             } catch (IOException e) {
@@ -86,7 +86,7 @@ public final class ClassReader implements Closeable {
             }
         });
 
-        ClassParser thisParser = new ClassParser(superParser, () -> {
+        ClassParser thisParser = new ClassParser("ThisClassParser",superParser, () -> {
             try {
                 this.parseThisClass();
             } catch (IOException e) {
@@ -94,7 +94,7 @@ public final class ClassReader implements Closeable {
             }
         });
 
-        ClassParser accessParser = new ClassParser(thisParser, () -> {
+        ClassParser accessParser = new ClassParser("AccessFlagsParser",thisParser, () -> {
             try {
                 this.parseAccessFlags();
             } catch (IOException e) {
@@ -102,14 +102,14 @@ public final class ClassReader implements Closeable {
             }
         });
 
-        ClassParser constParser = new ClassParser(accessParser, () -> {
+        ClassParser constParser = new ClassParser("ConstantPoolParser",accessParser, () -> {
             try {
                 this.parseConstantPool();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         });
-        ClassParser majorParser = new ClassParser(constParser, () -> {
+        ClassParser majorParser = new ClassParser("MajorVersionParser",constParser, () -> {
             try {
                 this.parseMajorVersion();
             } catch (IOException e) {
@@ -117,7 +117,7 @@ public final class ClassReader implements Closeable {
             }
         });
 
-        ClassParser minorParser = new ClassParser(majorParser, () -> {
+        ClassParser minorParser = new ClassParser("MinorVersionParser",majorParser, () -> {
             try {
                 this.parseMinorVersion();
             } catch (IOException e) {
@@ -125,7 +125,7 @@ public final class ClassReader implements Closeable {
             }
         });
 
-        return new ClassParser(minorParser, () -> {
+        return new ClassParser("MagicNumberParse",minorParser, () -> {
             try {
                 this.parseMagicNum();
             } catch (IOException e) {
