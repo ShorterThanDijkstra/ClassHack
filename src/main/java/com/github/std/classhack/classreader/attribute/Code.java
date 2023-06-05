@@ -731,131 +731,35 @@ public final class Code implements AttributeInfo {
 
     }
 
-    public static class LookupSwitchOpcode implements Opcode {
-        private final String mnemonic;
-        private final byte value;
-        private final byte[] operands;
-        private final int defaultJump;
-        private final int[] matchOffsetPairs;
-        private final int pos;
-
-        public LookupSwitchOpcode(String mnemonic, byte value, byte[] operands, int defaultJump, int[] matchOffsetPairs, int pos) {
-            this.mnemonic = mnemonic;
-            this.value = value;
-            this.operands = operands;
-            this.defaultJump = defaultJump;
-            this.matchOffsetPairs = matchOffsetPairs;
-            this.pos = pos;
-        }
+    public record LookupSwitchOpcode(String mnemonic, byte value, byte[] operands, int defaultJump,
+                                     int[] matchOffsetPairs, int pos) implements Opcode {
 
         @Override
-        public String mnemonic() {
-            return mnemonic;
-        }
-
-        @Override
-        public byte value() {
-            return value;
-        }
-
-        @Override
-        public byte[] operands() {
-            return operands;
-        }
-
-        @Override
-        public String show() {
-            StringBuilder builder = new StringBuilder(pos + ":  lookupswitch {\n");
-            for (int i = 0; i < matchOffsetPairs.length / 2; i++) {
-                builder.append("\t\t").append(matchOffsetPairs[i * 2]).append(": ").append(matchOffsetPairs[i * 2 + 1] + 1).append('\n');
+            public String show() {
+                StringBuilder builder = new StringBuilder(pos + ":  lookupswitch {\n");
+                for (int i = 0; i < matchOffsetPairs.length / 2; i++) {
+                    builder.append("\t\t").append(matchOffsetPairs[i * 2]).append(": ").append(matchOffsetPairs[i * 2 + 1] + 1).append('\n');
+                }
+                builder.append("\t\tdefault").append(": ").append(defaultJump + 1).append("\n\t}");
+                return builder.toString();
             }
-            builder.append("\t\tdefault").append(": ").append(defaultJump + 1).append("\n\t}");
-            return builder.toString();
         }
+
+    public record TableSwitchOpcode(String mnemonic, byte value, byte[] operands, int defaultJump, int low, int high,
+                                    int[] offsets, int pos) implements Opcode {
 
         @Override
-        public int pos() {
-            return pos;
-        }
-
-        public int getDefaultJump() {
-            return defaultJump;
-        }
-
-        public int[] getMatchOffsetPairs() {
-            return matchOffsetPairs;
-        }
-    }
-
-    public static class TableSwitchOpcode implements Opcode {
-        private final String mnemonic;
-        private final byte value;
-        private final byte[] operands;
-        private final int defaultJump;
-        private final int low;
-        private final int high;
-        private final int[] offsets;
-        private final int pos;
-
-        public TableSwitchOpcode(String mnemonic, byte value, byte[] operands, int defaultJump, int low, int high, int[] offsets, int pos) {
-            this.mnemonic = mnemonic;
-            this.value = value;
-            this.operands = operands;
-            this.defaultJump = defaultJump;
-            this.low = low;
-            this.high = high;
-            this.offsets = offsets;
-            this.pos = pos;
-        }
-
-        @Override
-        public String mnemonic() {
-            return mnemonic;
-        }
-
-        @Override
-        public byte value() {
-            return value;
-        }
-
-        @Override
-        public byte[] operands() {
-            return operands;
-        }
-
-        @Override
-        public String show() {
-            StringBuilder builder = new StringBuilder(pos + ":  tableswitch {\n");
-            int entry = low;
-            for (int offset : offsets) {
-                builder.append("\t\t").append(entry).append(": ").append(offset + 1).append('\n');
-                entry++;
+            public String show() {
+                StringBuilder builder = new StringBuilder(pos + ":  tableswitch {\n");
+                int entry = low;
+                for (int offset : offsets) {
+                    builder.append("\t\t").append(entry).append(": ").append(offset + 1).append('\n');
+                    entry++;
+                }
+                builder.append("\t\tdefault").append(": ").append(defaultJump + 1).append("\n\t}");
+                return builder.toString();
             }
-            builder.append("\t\tdefault").append(": ").append(defaultJump + 1).append("\n\t}");
-            return builder.toString();
         }
-
-        @Override
-        public int pos() {
-            return pos;
-        }
-
-        public int getDefaultJump() {
-            return defaultJump;
-        }
-
-        public int getLow() {
-            return low;
-        }
-
-        public int getHigh() {
-            return high;
-        }
-
-        public int[] getOffsets() {
-            return offsets;
-        }
-    }
 
     public static class FixLengthOpcode implements Opcode {
         public static final byte[] EMPTY_OPERANDS = new byte[0];

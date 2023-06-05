@@ -4,9 +4,9 @@ A JVM(Java 8) class file parser
 
 # Usage
 
-java -jar ClassHack-<version>.jar
+java -jar --enable-preview ClassHack-<version>.jar
 
-JRE version should be at least 19
+JRE version: 17+
 
 # Screenshot
 

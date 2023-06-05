@@ -1,1 +1,1 @@
-1. ClassReader fully test
+1. Tests for JDK classes

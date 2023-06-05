@@ -14,39 +14,133 @@ import java.util.List;
 import static com.github.std.classhack.classreader.util.BytesReader.readBytes2;
 
 public final class ClassReader implements Closeable {
-    private final InputStream input;
-    private final ClassFile.ClassFileBuilder builder;
-    private final ClassFormatChecker checker;
+    private InputStream input;
+    private ClassFile.ClassFileBuilder builder;
+    private ClassFormatChecker checker;
+    private ClassParser classRootParser;
+
+    private final ClassFile classFile;
 
     @Override
     public void close() throws IOException {
+        builder = null;
+        checker = null;
+        classRootParser = null;
         int read = input.read();
         if (read != -1) {
             throw new ClassFormatError();
         }
         input.close();
+        input = null;
     }
+
     public ClassReader(InputStream input) throws IOException {
         this.input = input;
         this.builder = new ClassFile.ClassFileBuilder();
         this.checker = new ClassFormatChecker();
+        this.classRootParser = initParseChain();
 
-        parseClassFile();
+        this.classFile = parseClassFile();
 
         close();
     }
-    private void parseClassFile() throws IOException {
-        parseMagicNum();
-        parseMinorVersion();
-        parseMajorVersion();
-        parseConstantPool();
-        parseAccessFlags();
-        parseThisClass();
-        parseSuperClass();
-        parseInterfaces();
-        parseFields();
-        parseMethods();
-        parseAttributes();
+
+    private ClassParser initParseChain() {
+        ClassParser attrParser = new ClassParser(null, () -> {
+            try {
+                this.parseAttributes();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        ClassParser methodParser = new ClassParser(attrParser, () -> {
+            try {
+                this.parseMethods();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        ClassParser fieldParser = new ClassParser(methodParser, () -> {
+            try {
+                this.parseFields();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        ClassParser interfaceParser = new ClassParser(fieldParser, () -> {
+            try {
+                this.parseInterfaces();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        ClassParser superParser = new ClassParser(interfaceParser, () -> {
+            try {
+                this.parseSuperClass();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        ClassParser thisParser = new ClassParser(superParser, () -> {
+            try {
+                this.parseThisClass();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        ClassParser accessParser = new ClassParser(thisParser, () -> {
+            try {
+                this.parseAccessFlags();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        ClassParser constParser = new ClassParser(accessParser, () -> {
+            try {
+                this.parseConstantPool();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+        ClassParser majorParser = new ClassParser(constParser, () -> {
+            try {
+                this.parseMajorVersion();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        ClassParser minorParser = new ClassParser(majorParser, () -> {
+            try {
+                this.parseMinorVersion();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        return new ClassParser(minorParser, () -> {
+            try {
+                this.parseMagicNum();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        });
+    }
+
+    private ClassFile parseClassFile() {
+        ClassParser parser = this.classRootParser;
+        while (parser != null) {
+            parser.parse();
+            parser = parser.next();
+        }
+        return builder.build();
     }
 
     private void parseMagicNum() throws IOException {
@@ -145,7 +239,7 @@ public final class ClassReader implements Closeable {
 
 
     public ClassFile getClassFile() {
-        return builder.build();
+        return classFile;
     }
 
 }
